@@ -29,10 +29,12 @@ public class GameplayManager : MonoBehaviour
 
     private void Update()
     {
-        // Не открываем паузу, если сейчас открыто меню письма/газеты
+        // Не открываем паузу, если открыто меню письма/газеты, компьютер или интервью
         if (Keyboard.current != null
             && Keyboard.current[pauseKey].wasPressedThisFrame
-            && !InteractableItem.AnyMenuOpen)
+            && !InteractableItem.AnyMenuOpen
+            && !ComputerManager.IsOpen
+            && !InterviewManager.IsOpen)
             TogglePause();
     }
 

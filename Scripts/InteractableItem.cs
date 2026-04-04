@@ -95,8 +95,7 @@ public class InteractableItem : MonoBehaviour
         Vector2 mouseWorldPos = _mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 
         // Рейкаст для определения наведения
-        Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos);
-        bool hoveringThis = hit != null && hit.gameObject == gameObject;
+        bool hoveringThis = IsMouseOverThis(mouseWorldPos);
 
         // Hover enter/exit
         if (hoveringThis && !_isHovered && !_isDragging)
@@ -250,5 +249,15 @@ public class InteractableItem : MonoBehaviour
     protected virtual void OnMenuOpened()
     {
         isOpened = true;
+    }
+
+    private bool IsMouseOverThis(Vector2 worldPoint)
+    {
+        Collider2D[] hits = Physics2D.OverlapPointAll(worldPoint);
+        foreach (var hit in hits)
+        {
+            if (hit.gameObject == gameObject) return true;
+        }
+        return false;
     }
 }
