@@ -203,7 +203,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7f6330a48f5b1544082ad229ad00f015, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e80c8aacd7ced0b44a6b6c0333ee9c19, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 6364107627882924448}
   - component: {fileID: 1911519341660408849}
   m_Layer: 5
-  m_Name: Letter1
+  m_Name: Letter2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -297,7 +297,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 08eddffe4216d504f9baaa9fa206dae4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ef5e04f19b4344448b390f91949da859, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -341,7 +341,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.0050848722, y: -0.0031041875}
+  m_Offset: {x: -0.005239755, y: 0.0044864267}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -351,7 +351,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.6123389, y: 0.37573153}
+  m_Size: {x: 0.6105092, y: 0.36353883}
   m_EdgeRadius: 0
 --- !u!114 &1911519341660408849
 MonoBehaviour:
@@ -365,15 +365,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4bacc13ced196a4ea661ad6d9bcb33f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LetterItem
-  normalSprite: {fileID: 21300000, guid: 08eddffe4216d504f9baaa9fa206dae4, type: 3}
-  outlineSprite: {fileID: 21300000, guid: 7624ee575b75b50418e06deb888a455b, type: 3}
+  normalSprite: {fileID: 21300000, guid: ef5e04f19b4344448b390f91949da859, type: 3}
+  outlineSprite: {fileID: 21300000, guid: 511d7753c3517374caa12b6e27e4056c, type: 3}
   hoverLiftAmount: 0.15
   hoverSpeed: 8
   menuPanel: {fileID: 7073108693765322357}
   dragSmoothing: 15
   clickThreshold: 0.15
-  openedSprite: {fileID: 21300000, guid: 704cef21d5ff868458cc20cff4b63f57, type: 3}
-  openedOutlineSprite: {fileID: 21300000, guid: cafbbdcf4b4c63a48abb20e8531f6a9c, type: 3}
+  openedSprite: {fileID: 21300000, guid: 15c77dc4d52570342ac80e1e7d6c8abb, type: 3}
+  openedOutlineSprite: {fileID: 21300000, guid: c711eb3b70d6fda4fa394a5fdcb79b8e, type: 3}
 --- !u!1 &8836936746881040411
 GameObject:
   m_ObjectHideFlags: 0
