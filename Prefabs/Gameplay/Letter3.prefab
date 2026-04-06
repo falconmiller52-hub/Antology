@@ -373,7 +373,7 @@ MonoBehaviour:
   dragSmoothing: 15
   clickThreshold: 0.15
   openedSprite: {fileID: 21300000, guid: 4417b2a38fb297a42931f846e6e3a94c, type: 3}
-  openedOutlineSprite: {fileID: 21300000, guid: 4417b2a38fb297a42931f846e6e3a94c, type: 3}
+  openedOutlineSprite: {fileID: 21300000, guid: a84c43fbf1c85294fb4a9593a5b9c929, type: 3}
 --- !u!1 &8836936746881040411
 GameObject:
   m_ObjectHideFlags: 0

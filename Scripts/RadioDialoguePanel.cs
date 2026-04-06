@@ -22,6 +22,10 @@ public class RadioDialoguePanel : MonoBehaviour
     [SerializeField] private float typeSpeed = 0.04f;
     [SerializeField] private int charsPerBlip = 2;
 
+    [Header("Intel Highlight")]
+    [SerializeField] private Color normalLineColor = Color.white;
+    [SerializeField] private Color intelLineColor = new Color(1f, 0.6f, 0.6f, 1f);
+
     private string[] _lines;
     private int _currentLineIndex;
     private System.Action _onFinished;
@@ -42,6 +46,13 @@ public class RadioDialoguePanel : MonoBehaviour
         _mainCamera = Camera.main;
         if (panelObject == null) panelObject = gameObject;
         if (canvasGroup == null) canvasGroup = GetComponentInParent<CanvasGroup>();
+
+        // Авто-создаём AudioSource для блипов если не назначен
+        if (blipSource == null)
+        {
+            blipSource = gameObject.AddComponent<AudioSource>();
+            blipSource.playOnAwake = false;
+        }
     }
 
     private void Update()
@@ -114,8 +125,14 @@ public class RadioDialoguePanel : MonoBehaviour
 
     private void DisplayCurrentLine()
     {
+        // Determine if this line carries intel
+        bool hasIntel = _intelKeys != null && _currentLineIndex < _intelKeys.Length && _intelKeys[_currentLineIndex] != null;
+
+        // Set text color based on intel
+        dialogueText.color = hasIntel ? intelLineColor : normalLineColor;
+
         // Auto-collect intel key for this line
-        if (_intelKeys != null && _currentLineIndex < _intelKeys.Length && _intelKeys[_currentLineIndex] != null)
+        if (hasIntel)
         {
             IntelManager.Instance?.CollectKey(_intelKeys[_currentLineIndex]);
         }

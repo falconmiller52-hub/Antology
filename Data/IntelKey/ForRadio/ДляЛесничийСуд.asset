@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c51a3a1713b921e40aa64617f1db378a, type: 3}
-  m_Name: ForInterview
+  m_Name: "\u0414\u043B\u044F\u041B\u0435\u0441\u043D\u0438\u0447\u0438\u0439\u0421\u0443\u0434"
   m_EditorClassIdentifier: Assembly-CSharp::IntelKey
-  keyName: "\u0418\u043D\u0442\u0435\u0440\u0432\u044C\u044E"
+  keyName: "\u041B\u0435\u0441\u043D\u0438\u0447\u0438\u0439"
   description: 

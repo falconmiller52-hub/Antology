@@ -62,14 +62,18 @@ public class InterviewManager : MonoBehaviour
         catalogPanel.SetActive(false);
         dialoguePanel.SetActive(true);
         _currentScreen = Screen.Dialogue;
+        InteractableItem.InteractionLocked = true;
 
         dialogueUI.Initialize(data, OnInterviewFinished);
     }
 
     private void OnInterviewFinished(InterviewData completed)
     {
-        // Интервью НЕ помечается как завершённое — можно проходить повторно
+        InteractableItem.InteractionLocked = false;
         AudioManager.Instance?.PlayButtonClick();
+
+        TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.InterviewCompleted);
+
         ShowCatalog();
     }
 

@@ -36,6 +36,12 @@ public class InteractableItem : MonoBehaviour
     /// </summary>
     public static bool AnyMenuOpen { get; private set; }
 
+    /// <summary>
+    /// Глобальная блокировка взаимодействия с окружением
+    /// (во время интервью, радио диалога, туториала).
+    /// </summary>
+    public static bool InteractionLocked { get; set; }
+
     protected SpriteRenderer spriteRenderer;
     protected bool isOpened;
     private bool _isHovered;
@@ -68,6 +74,8 @@ public class InteractableItem : MonoBehaviour
 
     protected virtual void Update()
     {
+        // Если заблокировано — только разрешаем закрывать уже открытое меню
+        if (InteractionLocked && !_menuIsOpen) { UpdatePosition(); return; }
         HandleInput();
         UpdatePosition();
     }
@@ -76,13 +84,12 @@ public class InteractableItem : MonoBehaviour
     {
         if (Mouse.current == null) return;
 
-        // Закрытие меню по Esc или клику мыши
+        // Закрытие меню ТОЛЬКО по Esc (не по клику)
         if (_menuIsOpen)
         {
             bool escPressed = Keyboard.current != null && Keyboard.current[Key.Escape].wasPressedThisFrame;
-            bool clickedAnywhere = Mouse.current.leftButton.wasPressedThisFrame;
 
-            if (escPressed || clickedAnywhere)
+            if (escPressed)
             {
                 CloseMenu();
                 return;

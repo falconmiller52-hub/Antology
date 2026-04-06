@@ -38,12 +38,25 @@ public class InterviewDialogueUI : MonoBehaviour
     [Header("Response Hover SFX")]
     [SerializeField] private AudioClip responseHoverSFX;
 
+    [Header("Intel Highlight")]
+    [SerializeField] private Color normalNpcLineColor = Color.white;
+    [SerializeField] private Color intelNpcLineColor = new Color(1f, 0.6f, 0.6f, 1f);
+
     private InterviewData _data;
     private System.Action<InterviewData> _onFinished;
     private int _currentNodeIndex;
     private bool _isTyping;
     private bool _skipTyping;
     private Coroutine _typeCoroutine;
+
+    private void Awake()
+    {
+        if (blipSource == null)
+        {
+            blipSource = gameObject.AddComponent<AudioSource>();
+            blipSource.playOnAwake = false;
+        }
+    }
 
     public void Initialize(InterviewData data, System.Action<InterviewData> onFinished)
     {
@@ -77,7 +90,11 @@ public class InterviewDialogueUI : MonoBehaviour
 
         ClearResponses();
 
-        if (node.intelKey != null)
+        // Highlight intel lines
+        bool hasIntel = node.intelKey != null;
+        npcLineText.color = hasIntel ? intelNpcLineColor : normalNpcLineColor;
+
+        if (hasIntel)
             IntelManager.Instance?.CollectKey(node.intelKey);
 
         StartTyping(node.npcLine);

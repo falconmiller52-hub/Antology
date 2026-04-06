@@ -64,6 +64,7 @@ public class StoryEditorUI : MonoBehaviour
     private int[] _selectedPhraseIndices;
     private GameObject[] _blockSlots;
     private bool _isActive;
+    private System.Collections.Generic.List<int> _blockPath = new System.Collections.Generic.List<int>();
 
     private int _totalFactionA;
     private int _totalFactionB;
@@ -83,6 +84,7 @@ public class StoryEditorUI : MonoBehaviour
         _isActive = true;
         _totalFactionA = 0;
         _totalFactionB = 0;
+        _blockPath.Clear();
 
         if (topicTitleText != null)
             topicTitleText.text = topic.topicTitle;
@@ -109,20 +111,23 @@ public class StoryEditorUI : MonoBehaviour
     {
         AudioManager.Instance?.PlayKeyboardTyping();
 
-        if (_currentBlockIndex > 0)
+        if (_blockPath.Count > 0)
         {
             submitButton.gameObject.SetActive(false);
 
-            _currentBlockIndex--;
+            // Возвращаемся к предыдущему блоку в пути
+            int previousBlock = _blockPath[_blockPath.Count - 1];
+            _blockPath.RemoveAt(_blockPath.Count - 1);
 
             // Вычитаем очки отменённой фразы
-            int undoneIndex = _selectedPhraseIndices[_currentBlockIndex];
-            StoryBlock block = _currentTopic.blocks[_currentBlockIndex];
+            int undoneIndex = _selectedPhraseIndices[previousBlock];
+            StoryBlock block = _currentTopic.blocks[previousBlock];
             PhraseOption undoneOption = block.phraseOptions[undoneIndex];
             _totalFactionA -= undoneOption.factionAPoints;
             _totalFactionB -= undoneOption.factionBPoints;
 
-            _filledPhrases[_currentBlockIndex] = null;
+            _filledPhrases[previousBlock] = null;
+            _currentBlockIndex = previousBlock;
 
             ResetBlockSlot(_currentBlockIndex);
             HighlightCurrentBlock();
@@ -171,9 +176,13 @@ public class StoryEditorUI : MonoBehaviour
         for (int i = 0; i < block.phraseOptions.Length; i++)
         {
             PhraseOption option = block.phraseOptions[i];
-            bool isUnlocked = IntelManager.Instance == null
-                || option.requiredIntelKey == null
-                || IntelManager.Instance.HasKey(option.requiredIntelKey);
+            bool isUnlocked;
+            if (option.requiredIntelKey == null)
+                isUnlocked = true; // Нет ключа — всегда доступна
+            else if (IntelManager.Instance == null)
+                isUnlocked = false; // IntelManager не найден — заблокировано
+            else
+                isUnlocked = IntelManager.Instance.HasKey(option.requiredIntelKey);
 
             GameObject btnObj = Instantiate(phraseButtonPrefab, phrasesContainer);
 
@@ -234,24 +243,46 @@ public class StoryEditorUI : MonoBehaviour
         StoryBlock block = _currentTopic.blocks[_currentBlockIndex];
         PhraseOption option = block.phraseOptions[phraseIndex];
 
+        // Track filled data
         _filledPhrases[_currentBlockIndex] = option.text;
         _selectedPhraseIndices[_currentBlockIndex] = phraseIndex;
         _totalFactionA += option.factionAPoints;
         _totalFactionB += option.factionBPoints;
 
+        // Track path for undo
+        _blockPath.Add(_currentBlockIndex);
+
         UpdateBlockSlot(_currentBlockIndex, option.text);
 
-        _currentBlockIndex++;
-
-        if (_currentBlockIndex >= _currentTopic.blocks.Length)
+        // Determine next block
+        if (block.isFinalBlock)
         {
+            // Final block — show submit
             ClearPhrases();
             submitButton.gameObject.SetActive(true);
         }
-        else
+        else if (option.nextBlockIndex >= 0 && option.nextBlockIndex < _currentTopic.blocks.Length)
         {
+            // Branch to specific block
+            _currentBlockIndex = option.nextBlockIndex;
             HighlightCurrentBlock();
             ShowPhrasesForCurrentBlock();
+        }
+        else
+        {
+            // Default: next sequential block
+            _currentBlockIndex++;
+
+            if (_currentBlockIndex >= _currentTopic.blocks.Length)
+            {
+                ClearPhrases();
+                submitButton.gameObject.SetActive(true);
+            }
+            else
+            {
+                HighlightCurrentBlock();
+                ShowPhrasesForCurrentBlock();
+            }
         }
     }
 
@@ -326,13 +357,22 @@ public class StoryEditorUI : MonoBehaviour
     {
         _isActive = false;
 
-        // Регистрируем блоки отдельно (для отображения в Intermedia)
+        // Собираем только заполненные блоки (по пути, не все)
+        var filledBlocks = new System.Collections.Generic.List<string>();
+        foreach (int idx in _blockPath)
+        {
+            if (_filledPhrases[idx] != null)
+                filledBlocks.Add(_filledPhrases[idx]);
+        }
+
         if (GameProgressManager.Instance != null)
             GameProgressManager.Instance.RegisterStory(
-                (string[])_filledPhrases.Clone(),
+                filledBlocks.ToArray(),
                 _totalFactionA,
                 _totalFactionB
             );
+
+        TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.StorySubmitted);
 
         _onSubmitted?.Invoke(_currentTopic);
     }

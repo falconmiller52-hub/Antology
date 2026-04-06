@@ -176,9 +176,11 @@ public class RadioReceiver : MonoBehaviour
     {
         _signalLocked = true;
         _dialogueActive = true;
+        InteractableItem.InteractionLocked = true;
 
-        if (staticSource != null) staticSource.volume = 0.05f;
-        if (voiceSource != null) voiceSource.volume = 1f;
+        // Останавливаем зацикленные звуки — теперь голос идёт через voice blip
+        if (staticSource != null) staticSource.Stop();
+        if (voiceSource != null) voiceSource.Stop();
 
         if (dialA != null) dialA.SetInteractable(false);
         if (dialB != null) dialB.SetInteractable(false);
@@ -197,12 +199,12 @@ public class RadioReceiver : MonoBehaviour
 
     private void OnDialogueFinished()
     {
-        // Помечаем как проигранное — больше не появится
         if (_activeMessage != null)
             _activeMessage.hasBeenPlayed = true;
 
         _dialogueActive = false;
         _signalLocked = false;
+        InteractableItem.InteractionLocked = false;
 
         if (dialA != null) dialA.SetInteractable(true);
         if (dialB != null) dialB.SetInteractable(true);
@@ -211,5 +213,7 @@ public class RadioReceiver : MonoBehaviour
         if (staticSource != null) staticSource.volume = 1f;
 
         if (dialoguePanel != null) dialoguePanel.Hide();
+
+        TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.RadioListened);
     }
 }

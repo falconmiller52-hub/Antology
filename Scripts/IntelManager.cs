@@ -39,16 +39,9 @@ public class IntelManager : MonoBehaviour
             Debug.Log($"[Intel] Collected: {key.keyName}");
             if (markingSFX != null)
                 AudioManager.Instance?.PlaySFXDirect(markingSFX);
+
+            TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.IntelCollected);
         }
-        if (_collectedKeys.Add(key))
-{
-    Debug.Log($"[Intel] Collected: {key.keyName}");
-    if (markingSFX != null)
-        AudioManager.Instance?.PlaySFXDirect(markingSFX);
-    
-    // Уведомляем туториал
-    TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.IntelCollected);
-}
     }
 
     /// <summary>
