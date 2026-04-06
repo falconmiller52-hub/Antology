@@ -51,6 +51,10 @@ public class StoryEditorUI : MonoBehaviour
     [SerializeField] private Color phraseTextNormalColor = new Color(0.7f, 0.7f, 0.7f, 1f);
     [SerializeField] private Color phraseTextHoverColor = new Color(0.9f, 1f, 0.9f, 1f);
 
+    [Header("Locked Phrase Colors")]
+    [SerializeField] private Color lockedTextColor = new Color(0.35f, 0.35f, 0.35f, 1f);
+    [SerializeField] private Color lockedBlockColor = new Color(0.12f, 0.12f, 0.12f, 0.6f);
+
     private StoryTopic _currentTopic;
     private System.Action<StoryTopic> _onSubmitted;
     private System.Action _onReturnToCatalog;
@@ -166,30 +170,44 @@ public class StoryEditorUI : MonoBehaviour
 
         for (int i = 0; i < block.phraseOptions.Length; i++)
         {
+            PhraseOption option = block.phraseOptions[i];
+            bool isUnlocked = IntelManager.Instance == null
+                || option.requiredIntelKey == null
+                || IntelManager.Instance.HasKey(option.requiredIntelKey);
+
             GameObject btnObj = Instantiate(phraseButtonPrefab, phrasesContainer);
 
             TextMeshProUGUI btnText = btnObj.GetComponentInChildren<TextMeshProUGUI>();
             if (btnText != null)
             {
-                btnText.text = block.phraseOptions[i].text;
-                btnText.color = phraseTextNormalColor;
+                btnText.text = isUnlocked ? option.text : "???";
+                btnText.color = isUnlocked ? phraseTextNormalColor : lockedTextColor;
             }
 
             Button btn = btnObj.GetComponent<Button>();
             if (btn != null)
             {
-                ColorBlock colors = btn.colors;
-                colors.normalColor = phraseNormalColor;
-                colors.highlightedColor = phraseHoverColor;
-                colors.pressedColor = phrasePressedColor;
-                colors.selectedColor = phraseHoverColor;
-                btn.colors = colors;
+                if (isUnlocked)
+                {
+                    ColorBlock colors = btn.colors;
+                    colors.normalColor = phraseNormalColor;
+                    colors.highlightedColor = phraseHoverColor;
+                    colors.pressedColor = phrasePressedColor;
+                    colors.selectedColor = phraseHoverColor;
+                    btn.colors = colors;
 
-                int capturedIndex = i;
-                TextMeshProUGUI capturedText = btnText;
-                btn.onClick.AddListener(() => OnPhraseSelected(capturedIndex));
-
-                AddTextHoverEffect(btnObj, capturedText);
+                    int capturedIndex = i;
+                    TextMeshProUGUI capturedText = btnText;
+                    btn.onClick.AddListener(() => OnPhraseSelected(capturedIndex));
+                    AddTextHoverEffect(btnObj, capturedText);
+                }
+                else
+                {
+                    btn.interactable = false;
+                    ColorBlock colors = btn.colors;
+                    colors.disabledColor = lockedBlockColor;
+                    btn.colors = colors;
+                }
             }
         }
     }
@@ -308,12 +326,13 @@ public class StoryEditorUI : MonoBehaviour
     {
         _isActive = false;
 
-        // Собираем текст сюжета из заполненных фраз
-        string assembledText = string.Join(" ", _filledPhrases);
-
-        // Регистрируем в системе прогрессии
+        // Регистрируем блоки отдельно (для отображения в Intermedia)
         if (GameProgressManager.Instance != null)
-            GameProgressManager.Instance.RegisterStory(assembledText, _totalFactionA, _totalFactionB);
+            GameProgressManager.Instance.RegisterStory(
+                (string[])_filledPhrases.Clone(),
+                _totalFactionA,
+                _totalFactionB
+            );
 
         _onSubmitted?.Invoke(_currentTopic);
     }

@@ -70,6 +70,8 @@ public class MicrophoneButton : MonoBehaviour
 
             if (_isActive)
                 interviewManager?.OpenCatalog();
+            else
+                interviewManager?.CloseCatalog();
         }
     }
 

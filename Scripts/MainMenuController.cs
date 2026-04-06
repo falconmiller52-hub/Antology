@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class MainMenuController : MonoBehaviour
 {
-    [SerializeField] private string gameplaySceneName = "Gameplay";
+    [SerializeField] private string gameplaySceneName = "Gameplay1";
 
     /// <summary>
     /// Привязывается к кнопке Play через Inspector → OnClick().

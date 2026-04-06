@@ -71,31 +71,33 @@ public class BroadcastScene : MonoBehaviour
 
         // Приветствие
         if (greetingLines != null)
-        {
             foreach (string line in greetingLines)
                 _allLines.Add(line);
-        }
 
-        // Сюжеты игрока
+        // Сюжеты игрока — блок за блоком
         if (GameProgressManager.Instance != null)
         {
-            string[] stories = GameProgressManager.Instance.GetTodayStories();
-            if (stories != null)
+            List<string[]> storyBlocks = GameProgressManager.Instance.GetTodayStoryBlocks();
+            if (storyBlocks != null)
             {
-                foreach (string story in stories)
+                for (int s = 0; s < storyBlocks.Count; s++)
                 {
-                    if (!string.IsNullOrEmpty(story))
-                        _allLines.Add(story);
+                    string[] blocks = storyBlocks[s];
+                    if (blocks == null) continue;
+
+                    foreach (string block in blocks)
+                    {
+                        if (!string.IsNullOrEmpty(block))
+                            _allLines.Add(block);
+                    }
                 }
             }
         }
 
         // Прощание
         if (farewellLines != null)
-        {
             foreach (string line in farewellLines)
                 _allLines.Add(line);
-        }
     }
 
     private void ShowLine(int index)

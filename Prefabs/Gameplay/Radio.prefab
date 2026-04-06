@@ -298,8 +298,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RadioDialoguePanel
   dialogueText: {fileID: 2977042459090269827}
   panelObject: {fileID: 4728569064345867793}
+  blipSource: {fileID: 0}
   fadeInDuration: 0.3
   canvasGroup: {fileID: 6648896493932311989}
+  typeSpeed: 0.04
+  charsPerBlip: 2
 --- !u!1 &6540233335630073401
 GameObject:
   m_ObjectHideFlags: 0
@@ -954,9 +957,10 @@ MonoBehaviour:
   powerButton: {fileID: 1056529902591390962}
   staticSource: {fileID: 0}
   voiceSource: {fileID: 0}
-  staticNoiseClip: {fileID: 0}
-  voiceMumbleClip: {fileID: 0}
+  staticNoiseClip: {fileID: 8300000, guid: 6ea4cc0151e164d4baaa33ab54ee844d, type: 3}
+  voiceMumbleClip: {fileID: 8300000, guid: 728a1b4b56383aa4699a178c90eb5f65, type: 3}
   signalTolerance: 0.08
   hearingRadius: 0.25
   dialoguePanel: {fileID: 3254903264835441379}
-  currentMessage: {fileID: 11400000, guid: 19bb727869e6ba947ae395e5f6ebab11, type: 2}
+  allMessages:
+  - {fileID: 11400000, guid: 19bb727869e6ba947ae395e5f6ebab11, type: 2}

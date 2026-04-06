@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 /// <summary>
 /// Синглтон прогрессии: дни, счётчик сюжетов, очки фракций.
@@ -18,7 +19,7 @@ public class GameProgressManager : MonoBehaviour
     [SerializeField] private int totalDays = 3;
 
     [Header("Scene Names")]
-    [SerializeField] private string gameplayScene = "Gameplay";
+    [SerializeField] private string[] gameplayScenes = { "Gameplay1", "Gameplay2", "Gameplay3" };
     [SerializeField] private string intermediaScene = "Intermedia";
     [SerializeField] private string endingAScene = "EndingA";
     [SerializeField] private string endingBScene = "EndingB";
@@ -32,8 +33,8 @@ public class GameProgressManager : MonoBehaviour
     public int StoriesPerDay => storiesPerDay;
     public int TotalDays => totalDays;
 
-    // Сюжеты за текущий день (тексты для вещания)
-    private string[] _todayStoryTexts;
+    // Сюжеты за текущий день (каждый сюжет = массив блоков)
+    private List<string[]> _todayStoryBlocks = new List<string[]>();
 
     private void Awake()
     {
@@ -45,17 +46,44 @@ public class GameProgressManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        // Полный сброс SO при первом создании (на случай грязного состояния в редакторе)
+        ResetAllScriptableObjects();
         ResetDay();
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // При входе в Gameplay сцену сбрасываем per-day SO состояния
+        // (isCompleted у StoryTopic сбрасывается, т.к. каждая сцена имеет свои темы)
+        // InterviewData.isCompleted НЕ сбрасываем — интервью per-game
+        // RadioMessage.hasBeenPlayed НЕ сбрасываем — per-game
+        if (scene.name.StartsWith("Gameplay"))
+        {
+            // Сбрасываем только темы сюжетов (они per-day)
+            foreach (var topic in Resources.FindObjectsOfTypeAll<StoryTopic>())
+                topic.ResetState();
+
+            Debug.Log($"[GameProgress] Loaded {scene.name}. Day={CurrentDay}, " +
+                      $"Stories={StoriesCompletedToday}, FactionA={FactionAScore}, FactionB={FactionBScore}");
+        }
     }
 
     /// <summary>
     /// Вызывается из StoryEditorUI после отправки сюжета.
+    /// blocks — массив заполненных фраз (по блокам).
     /// </summary>
-    public void RegisterStory(string assembledText, int factionAPoints, int factionBPoints)
+    public void RegisterStory(string[] blocks, int factionAPoints, int factionBPoints)
     {
         if (StoriesCompletedToday < storiesPerDay)
         {
-            _todayStoryTexts[StoriesCompletedToday] = assembledText;
+            _todayStoryBlocks.Add(blocks);
             StoriesCompletedToday++;
         }
 
@@ -68,11 +96,12 @@ public class GameProgressManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Возвращает тексты сюжетов за сегодня (для сцены Intermedia).
+    /// Возвращает все блоки всех сюжетов за сегодня (для Intermedia).
+    /// Каждый сюжет = массив строк (блоков), отображаются реплика за репликой.
     /// </summary>
-    public string[] GetTodayStories()
+    public List<string[]> GetTodayStoryBlocks()
     {
-        return _todayStoryTexts;
+        return _todayStoryBlocks;
     }
 
     /// <summary>
@@ -92,21 +121,21 @@ public class GameProgressManager : MonoBehaviour
 
         if (CurrentDay > totalDays)
         {
-            // Конец игры — выбираем концовку
             string endingScene = (FactionBScore > FactionAScore) ? endingBScene : endingAScene;
             SceneManager.LoadScene(endingScene);
         }
         else
         {
             ResetDay();
-            SceneManager.LoadScene(gameplayScene);
+            int sceneIndex = Mathf.Clamp(CurrentDay - 1, 0, gameplayScenes.Length - 1);
+            SceneManager.LoadScene(gameplayScenes[sceneIndex]);
         }
     }
 
     private void ResetDay()
     {
         StoriesCompletedToday = 0;
-        _todayStoryTexts = new string[storiesPerDay];
+        _todayStoryBlocks.Clear();
     }
 
     /// <summary>
@@ -118,5 +147,32 @@ public class GameProgressManager : MonoBehaviour
         FactionAScore = 0;
         FactionBScore = 0;
         ResetDay();
+
+        ResetAllScriptableObjects();
+
+        // Сброс собранных ключей разведки
+        if (IntelManager.Instance != null)
+            IntelManager.Instance.ResetAll();
     }
+
+    private void ResetAllScriptableObjects()
+    {
+        foreach (var msg in Resources.FindObjectsOfTypeAll<RadioMessage>())
+            msg.ResetState();
+        foreach (var topic in Resources.FindObjectsOfTypeAll<StoryTopic>())
+            topic.ResetState();
+        foreach (var interview in Resources.FindObjectsOfTypeAll<InterviewData>())
+            interview.ResetState();
+    }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// Сбрасывает SO состояния при выходе из Play Mode в редакторе,
+    /// чтобы isCompleted/hasBeenPlayed не застревали.
+    /// </summary>
+    private void OnApplicationQuit()
+    {
+        ResetAllScriptableObjects();
+    }
+#endif
 }

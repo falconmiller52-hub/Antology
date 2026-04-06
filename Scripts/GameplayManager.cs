@@ -17,14 +17,32 @@ public class GameplayManager : MonoBehaviour
 
     private bool _isPaused;
 
+    private void Awake()
+    {
+        HidePauseMenu();
+        Time.timeScale = 1f;
+    }
+
+    private void OnEnable()
+    {
+        HidePauseMenu();
+    }
+
     private void Start()
     {
-        // Убеждаемся, что меню паузы скрыто и время идёт
+        _isPaused = false;
+        HidePauseMenu();
+
+        if (pauseMenuPanel == null)
+            Debug.LogError("[GameplayManager] pauseMenuPanel is NOT assigned! Drag it into the Inspector.");
+        else
+            Debug.Log($"[GameplayManager] pauseMenuPanel '{pauseMenuPanel.name}' active: {pauseMenuPanel.activeSelf}");
+    }
+
+    private void HidePauseMenu()
+    {
         if (pauseMenuPanel != null)
             pauseMenuPanel.SetActive(false);
-
-        Time.timeScale = 1f;
-        _isPaused = false;
     }
 
     private void Update()

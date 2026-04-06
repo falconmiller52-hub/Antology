@@ -31,15 +31,28 @@ public class EndShiftButton : MonoBehaviour
     {
         if (button == null) button = GetComponent<Button>();
         button.onClick.AddListener(OnClicked);
+        UpdateState();
+    }
+
+    private void OnEnable()
+    {
+        UpdateState();
     }
 
     /// <summary>
     /// Вызывается для обновления состояния кнопки.
-    /// Проверяйте после каждого отправленного сюжета.
     /// </summary>
     public void UpdateState()
     {
-        bool canEnd = GameProgressManager.Instance != null && GameProgressManager.Instance.CanEndShift;
+        if (button == null) button = GetComponent<Button>();
+
+        bool hasProgress = GameProgressManager.Instance != null;
+        bool canEnd = hasProgress && GameProgressManager.Instance.CanEndShift;
+
+        Debug.Log($"[EndShiftButton] GameProgress exists: {hasProgress}, " +
+                  $"Stories: {(hasProgress ? GameProgressManager.Instance.StoriesCompletedToday : 0)}/" +
+                  $"{(hasProgress ? GameProgressManager.Instance.StoriesPerDay : 0)}, " +
+                  $"CanEnd: {canEnd}");
 
         button.interactable = canEnd;
 

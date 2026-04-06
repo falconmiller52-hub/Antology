@@ -14,6 +14,9 @@ public class PhraseOption
 
     [Tooltip("Очки для фракции B (оппозиция)")]
     public int factionBPoints;
+
+    [Tooltip("Ключ разведки, необходимый для разблокировки этой фразы. Пустой = всегда доступна.")]
+    public IntelKey requiredIntelKey;
 }
 
 /// <summary>

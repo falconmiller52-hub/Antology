@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5168620f64fd16d4ab411f12b15f1e74, type: 3}
   m_Name: InterviewTest 1
   m_EditorClassIdentifier: Assembly-CSharp::InterviewData
-  npcName: "\u0422\u0435\u0441\u0442\u0438\u0440\u0443\u0435\u043C"
+  npcName: "\u041D\u041F\u04212"
   npcIcon: {fileID: 8221397018206217885, guid: 84756c98c9de58f4bb48ee713011d08e, type: 3}
   npcDescription: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430"
+  voiceBlip: {fileID: 8300000, guid: 3fafad4924ab14f4c85983ecade15442, type: 3}
+  voicePitch: 1
   nodes:
   - npcLine: "\u0427\u0442\u043E \u0445\u043E\u0447\u0435\u0448\u044C \u0443\u0437\u043D\u0430\u0442\u044C?"
     responses:

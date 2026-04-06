@@ -14,10 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RadioMessage
   targetFrequencyA: 1
   targetFrequencyB: 1
+  dayNumber: 1
   lines:
   - Hello!
   - Hey! Hiii!
   - Hiiii! X3
+  lineIntelKeys:
+  - {fileID: 11400000, guid: 231d0875f5453a74abae86cf574ed711, type: 2}
+  voiceBlip: {fileID: 8300000, guid: 3fafad4924ab14f4c85983ecade15442, type: 3}
+  voicePitch: 1
   senderName: A man
   description: "\u041F\u0435\u0440\u0435\u0445\u0432\u0430\u0447\u0435\u043D\u043D\u043E\u0435
     \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435"
+  hasBeenPlayed: 0

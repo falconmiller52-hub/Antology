@@ -153,8 +153,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MicrophoneButton
   interviewManager: {fileID: 0}
-  normalSprite: {fileID: 21300000, guid: 446d8cdb9bebaaa47bea97176f8a98b3, type: 3}
-  hoverSprite: {fileID: 21300000, guid: 330270d70aeeb49469fc31b35e8f262a, type: 3}
+  headphonesObject: {fileID: 8542811622412340491}
+  inactiveNormal: {fileID: 21300000, guid: 446d8cdb9bebaaa47bea97176f8a98b3, type: 3}
+  inactiveOutline: {fileID: 21300000, guid: 330270d70aeeb49469fc31b35e8f262a, type: 3}
+  activeNormal: {fileID: 21300000, guid: aae05ff78ddc5e54eb115b3d1dd45978, type: 3}
+  activeOutline: {fileID: 21300000, guid: f9cfa17ce992f9d4b9715bcdb71dcd6d, type: 3}
 --- !u!1 &8542811622412340491
 GameObject:
   m_ObjectHideFlags: 0

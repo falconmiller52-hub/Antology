@@ -26,6 +26,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip gameplayMusic;
     [SerializeField] private AudioClip intermediaMusic;
     [SerializeField] private AudioClip endingMusic;
+    [SerializeField] private AudioClip titleMusic;
 
     [Header("Ambient")]
     [SerializeField] private AudioClip gameplayAmbient;
@@ -100,16 +101,16 @@ public class AudioManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        bool isGameplay = scene.name.StartsWith("Gameplay");
+
         // Музыка по сценам
-        AudioClip targetClip = scene.name switch
-        {
-            "MainMenu" => mainMenuMusic,
-            "Gameplay" => gameplayMusic,
-            "Intermedia" => intermediaMusic,
-            "EndingA" => endingMusic,
-            "EndingB" => endingMusic,
-            _ => null
-        };
+        AudioClip targetClip;
+        if (scene.name == "MainMenu") targetClip = mainMenuMusic;
+        else if (isGameplay) targetClip = gameplayMusic;
+        else if (scene.name == "Intermedia") targetClip = intermediaMusic;
+        else if (scene.name == "EndingA" || scene.name == "EndingB") targetClip = endingMusic;
+        else if (scene.name == "Title") targetClip = titleMusic;
+        else targetClip = null;
 
         if (targetClip != null && musicSource.clip != targetClip)
         {
@@ -125,15 +126,15 @@ public class AudioManager : MonoBehaviour
 
         SetMusicVolume(normalMusicVolume);
 
-        // Эмбиент только в Gameplay
-        if (scene.name == "Gameplay" && gameplayAmbient != null)
+        // Эмбиент только в Gameplay сценах
+        if (isGameplay && gameplayAmbient != null && ambientSource != null)
         {
             ambientSource.clip = gameplayAmbient;
             ambientSource.volume = ambientVolume;
             ambientSource.loop = true;
             ambientSource.Play();
         }
-        else
+        else if (ambientSource != null)
         {
             ambientSource.Stop();
         }
@@ -238,13 +239,13 @@ public class AudioManager : MonoBehaviour
 
     public void DimAmbient()
     {
-        if (ambientSource.isPlaying)
+        if (ambientSource != null && ambientSource.isPlaying)
             ambientSource.volume = ambientVolume * 0.3f;
     }
 
     public void RestoreAmbient()
     {
-        if (ambientSource.isPlaying)
+        if (ambientSource != null && ambientSource.isPlaying)
             ambientSource.volume = ambientVolume;
     }
 
@@ -256,7 +257,15 @@ public class AudioManager : MonoBehaviour
 
     private void PlaySFX(AudioClip clip)
     {
-        if (clip != null)
+        if (clip != null && sfxSource != null)
             sfxSource.PlayOneShot(clip);
+    }
+
+    /// <summary>
+    /// Проигрывает произвольный звук через SFX канал (для внешних систем).
+    /// </summary>
+    public void PlaySFXDirect(AudioClip clip)
+    {
+        PlaySFX(clip);
     }
 }

@@ -26,8 +26,12 @@ public class InterviewCatalogUI : MonoBehaviour
         foreach (Transform child in npcContainer)
             Destroy(child.gameObject);
 
+        Debug.Log($"[InterviewCatalog] Populating with {interviews.Length} interviews");
+
         foreach (InterviewData data in interviews)
         {
+            Debug.Log($"[InterviewCatalog] NPC '{data.npcName}' isCompleted={data.isCompleted}");
+
             if (data.isCompleted) continue;
 
             GameObject btnObj = Instantiate(npcButtonPrefab, npcContainer);

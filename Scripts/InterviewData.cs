@@ -20,6 +20,12 @@ public class InterviewData : ScriptableObject
     [TextArea(1, 2)]
     public string npcDescription = "Описание персонажа";
 
+    [Header("Voice")]
+    [Tooltip("Звук голосовой дорожки НПС (Undertale-стиль)")]
+    public AudioClip voiceBlip;
+    [Range(0.5f, 2f)]
+    public float voicePitch = 1f;
+
     [Header("Dialogue Tree")]
     public DialogueNode[] nodes;
 
@@ -48,6 +54,9 @@ public class DialogueNode
 
     [Tooltip("Если true — после выбора любого ответа из цикла, НПС повторяет эту же реплику")]
     public bool isCyclic;
+
+    [Tooltip("Ключ разведки, автоматически собираемый при показе этой реплики НПС")]
+    public IntelKey intelKey;
 }
 
 /// <summary>

@@ -52,6 +52,11 @@ public class InterviewManager : MonoBehaviour
         ShowCatalog();
     }
 
+    public void CloseCatalog()
+    {
+        CloseAll();
+    }
+
     public void StartInterview(InterviewData data)
     {
         catalogPanel.SetActive(false);
@@ -63,10 +68,8 @@ public class InterviewManager : MonoBehaviour
 
     private void OnInterviewFinished(InterviewData completed)
     {
-        completed.isCompleted = true;
+        // Интервью НЕ помечается как завершённое — можно проходить повторно
         AudioManager.Instance?.PlayButtonClick();
-
-        // Возвращаемся в каталог
         ShowCatalog();
     }
 
