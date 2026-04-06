@@ -68,19 +68,21 @@ public class TutorialManager : MonoBehaviour
     {
         if (blocks == null || blocks.Length == 0)
         {
-            // Нет туториала — всё разблокировано
+            Debug.Log("[Tutorial] No blocks configured — tutorial disabled.");
             IsTutorialActive = false;
             return;
         }
 
+        Debug.Log($"[Tutorial] Starting tutorial with {blocks.Length} blocks.");
         IsTutorialActive = true;
         InteractableItem.InteractionLocked = true;
 
-        // Скрываем всё
         DisableAllZones();
 
         if (tutorialPanel != null)
             tutorialPanel.SetActive(true);
+        else
+            Debug.LogError("[Tutorial] tutorialPanel is NOT assigned!");
 
         _currentBlockIndex = 0;
         StartBlock(_currentBlockIndex);
@@ -107,23 +109,33 @@ public class TutorialManager : MonoBehaviour
     /// </summary>
     public void OnTutorialEvent(TutorialEventType eventType)
     {
+        Debug.Log($"[Tutorial] Event received: {eventType}, active={IsTutorialActive}, waiting={_waitingForEvent}, " +
+                  $"currentBlock={_currentBlockIndex}, expectedEvent={(_currentBlockIndex < blocks.Length ? blocks[_currentBlockIndex].waitForEvent.ToString() : "N/A")}");
+
         if (!IsTutorialActive || !_waitingForEvent) return;
 
         TutorialBlock currentBlock = blocks[_currentBlockIndex];
         if (currentBlock.waitForEvent == eventType)
         {
+            Debug.Log($"[Tutorial] Event matched! Waiting for menus to close...");
             _waitingForEvent = false;
-            // Ждём пока все меню закроются перед показом следующего блока
             StartCoroutine(WaitForMenusClosedThenAdvance());
         }
     }
 
     private IEnumerator WaitForMenusClosedThenAdvance()
     {
-        // Ждём пока закроются все меню (письма, газеты, ПК, интервью)
-        yield return null; // Минимум 1 кадр
+        yield return null;
+
+        Debug.Log($"[Tutorial] Checking menus: AnyMenuOpen={InteractableItem.AnyMenuOpen}, " +
+                  $"ComputerOpen={ComputerManager.IsOpen}, InterviewOpen={InterviewManager.IsOpen}");
+
         while (InteractableItem.AnyMenuOpen || ComputerManager.IsOpen || InterviewManager.IsOpen)
+        {
             yield return null;
+        }
+
+        Debug.Log($"[Tutorial] Menus closed. Advancing to block {_currentBlockIndex + 1}");
 
         InteractableItem.InteractionLocked = true;
 
@@ -173,6 +185,7 @@ public class TutorialManager : MonoBehaviour
                 _waitingForEvent = true;
                 InteractableItem.InteractionLocked = false;
                 tutorialPanel.SetActive(false);
+                Debug.Log($"[Tutorial] Block {_currentBlockIndex} lines done. Waiting for {block.waitForEvent}. InteractionLocked=false.");
             }
             else
             {

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 86529c435fa471d46ade8df9bc99db03
+guid: 91645d3fbc4a0bf4c858ae82444d2689
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3034042546526509352
-    second: Interview_button_chosen_0
+      213: -6429975537581701714
+    second: Angry_man_photo_chosen_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Interview_button_chosen_0
+      name: Angry_man_photo_chosen_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 199
-        height: 45
+        width: 48
+        height: 57
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 829522bfe951b1a20800000000000000
-      internalID: 3034042546526509352
+      spriteID: ea5cdf7e05324c6a0800000000000000
+      internalID: -6429975537581701714
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Interview_button_chosen_0: 3034042546526509352
+      Angry_man_photo_chosen_0: -6429975537581701714
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

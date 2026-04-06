@@ -453,6 +453,7 @@ GameObject:
   - component: {fileID: 6353940162920985154}
   - component: {fileID: 4705111791479576658}
   - component: {fileID: 7668306068957042832}
+  - component: {fileID: 67719463143171251}
   m_Layer: 5
   m_Name: Text (TMP) (1)
   m_TagString: Untagged
@@ -592,6 +593,22 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &67719463143171251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4495781869172402974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 705f8c2e1103abf4d85bbcf117ea9029, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MarkableText
+  intelKey: {fileID: 11400000, guid: 167145621f3000544807c4ea803d808a, type: 2}
+  normalColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  hoverColor: {r: 0.4, g: 0.4, b: 0.15, a: 1}
+  markedColor: {r: 0.8, g: 0.2, b: 0.2, a: 1}
 --- !u!1 &5032400591454007984
 GameObject:
   m_ObjectHideFlags: 0

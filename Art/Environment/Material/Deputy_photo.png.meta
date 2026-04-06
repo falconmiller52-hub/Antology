@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 86529c435fa471d46ade8df9bc99db03
+guid: e9413e59119f49440a56a97bb97406e4
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3034042546526509352
-    second: Interview_button_chosen_0
+      213: -1535925135145141786
+    second: Deputy_photo_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Interview_button_chosen_0
+      name: Deputy_photo_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 199
-        height: 45
+        width: 46
+        height: 57
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 829522bfe951b1a20800000000000000
-      internalID: 3034042546526509352
+      spriteID: 6e9741e2a3c4faae0800000000000000
+      internalID: -1535925135145141786
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Interview_button_chosen_0: 3034042546526509352
+      Deputy_photo_0: -1535925135145141786
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

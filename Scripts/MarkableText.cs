@@ -4,17 +4,16 @@ using TMPro;
 
 /// <summary>
 /// Интерактивный текстовый блок в меню газеты/письма.
-/// Игрок может навести (смена цвета) и кликнуть (маркирование — собирает IntelKey).
+/// Работает через EventSystem (IPointer) И через ручную проверку как fallback.
 ///
-/// Настройка:
-/// 1. На TextMeshProUGUI внутри menuPanel газеты/письма.
-/// 2. Назначьте intelKey — ключ, который собирается при маркировании.
-/// 3. Если intelKey = null, блок обычный (не интерактивный).
+/// Требования:
+/// 1. Canvas с Graphic Raycaster.
+/// 2. EventSystem с Input System UI Input Module.
+/// 3. На TextMeshProUGUI: Raycast Target = true.
 /// </summary>
 public class MarkableText : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [Header("Intel")]
-    [Tooltip("Ключ, собираемый при маркировании. Null = обычный текст.")]
     [SerializeField] private IntelKey intelKey;
 
     [Header("Colors")]
@@ -31,7 +30,6 @@ public class MarkableText : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         _text = GetComponent<TextMeshProUGUI>();
         _isInteractive = intelKey != null;
 
-        // Проверяем, не был ли уже собран ключ ранее
         if (_isInteractive && IntelManager.Instance != null && IntelManager.Instance.HasKey(intelKey))
         {
             _isMarked = true;
@@ -39,7 +37,19 @@ public class MarkableText : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         }
         else
         {
-            _text.color = normalColor;
+            _text.color = _isInteractive ? normalColor : _text.color;
+        }
+
+        // Убедимся что Raycast Target включён для интерактивных
+        if (_isInteractive)
+            _text.raycastTarget = true;
+    }
+
+    private void Start()
+    {
+        if (_isInteractive)
+        {
+            Debug.Log($"[MarkableText] '{gameObject.name}' interactive, intelKey='{intelKey.keyName}', marked={_isMarked}");
         }
     }
 
@@ -59,9 +69,20 @@ public class MarkableText : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     {
         if (!_isInteractive || _isMarked) return;
 
+        Debug.Log($"[MarkableText] Clicked! Marking '{intelKey.keyName}'");
+
         _isMarked = true;
         _text.color = markedColor;
 
-        IntelManager.Instance?.CollectKey(intelKey);
+        if (IntelManager.Instance != null)
+        {
+            IntelManager.Instance.CollectKey(intelKey);
+        }
+        else
+        {
+            Debug.LogError("[MarkableText] IntelManager.Instance is NULL! Add IntelManager to MainMenu scene or Gameplay scene.");
+            // Прямой вызов туториала как fallback
+            TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.IntelCollected);
+        }
     }
 }
