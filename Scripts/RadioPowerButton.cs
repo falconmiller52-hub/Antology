@@ -64,9 +64,10 @@ public class RadioPowerButton : MonoBehaviour
             _isOn = !_isOn;
             _renderer.sprite = _isOn ? onSprite : offSprite;
 
+            AudioManager.Instance?.PlayEquipmentActivate();
+
             if (radioReceiver != null)
             {
-                Debug.Log($"[RadioPowerButton] Toggling power. Now: {(_isOn ? "ON" : "OFF")}");
                 radioReceiver.TogglePower();
             }
             else

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 941934f3df2ce514c9c169b90e032722, type: 3}
   m_Name: MessageTest
   m_EditorClassIdentifier: Assembly-CSharp::RadioMessage
-  targetFrequencyA: 0.3
-  targetFrequencyB: 0.7
+  targetFrequencyA: 1
+  targetFrequencyB: 1
   lines:
   - Hello!
   - Hey! Hiii!

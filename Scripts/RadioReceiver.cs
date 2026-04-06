@@ -68,31 +68,37 @@ public class RadioReceiver : MonoBehaviour
     public void TogglePower()
     {
         SetPoweredState(!_isPoweredOn);
-        AudioManager.Instance?.PlayButtonClick();
     }
 
     private void SetPoweredState(bool on)
     {
         _isPoweredOn = on;
 
-        // Включаем/отключаем триггеры
         if (dialA != null) dialA.SetInteractable(on);
         if (dialB != null) dialB.SetInteractable(on);
 
         if (on)
         {
-            // Включаем помехи
-            if (staticSource != null && staticNoiseClip != null)
+            // Используем клипы из инспектора, или из AudioManager как fallback
+            AudioClip staticClip = staticNoiseClip;
+            AudioClip voiceClip = voiceMumbleClip;
+
+            if (staticClip == null && AudioManager.Instance != null)
+                staticClip = AudioManager.Instance.GetRadioStaticClip();
+            if (voiceClip == null && AudioManager.Instance != null)
+                voiceClip = AudioManager.Instance.GetRadioVoiceClip();
+
+            if (staticSource != null && staticClip != null)
             {
-                staticSource.clip = staticNoiseClip;
+                staticSource.clip = staticClip;
                 staticSource.loop = true;
                 staticSource.volume = 1f;
                 staticSource.Play();
             }
 
-            if (voiceSource != null && voiceMumbleClip != null)
+            if (voiceSource != null && voiceClip != null)
             {
-                voiceSource.clip = voiceMumbleClip;
+                voiceSource.clip = voiceClip;
                 voiceSource.loop = true;
                 voiceSource.volume = 0f;
                 voiceSource.Play();

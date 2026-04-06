@@ -23,6 +23,9 @@ public class InterviewManager : MonoBehaviour
     [Header("Interviews")]
     [SerializeField] private InterviewData[] availableInterviews;
 
+    [Header("Microphone")]
+    [SerializeField] private MicrophoneButton microphoneButton;
+
     public static bool IsOpen { get; private set; }
 
     private enum Screen { Closed, Catalog, Dialogue }
@@ -99,5 +102,7 @@ public class InterviewManager : MonoBehaviour
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
         _currentScreen = Screen.Closed;
         IsOpen = false;
+
+        microphoneButton?.Deactivate();
     }
 }

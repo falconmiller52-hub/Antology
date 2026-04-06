@@ -2,14 +2,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Управляет UI компьютера: переключение между каталогом тем и редактором сюжета.
-/// Esc закрывает текущий экран (редактор → каталог → закрыть).
+/// Управляет UI компьютера: анимация включения, каталог тем, редактор сюжета, кнопка завершения смены.
 ///
 /// Настройка:
-/// 1. Создайте Canvas (Screen Space - Overlay, Sort Order = 50).
-/// 2. Внутри — два Panel: TopicListPanel и StoryEditorPanel.
-/// 3. Повесьте этот скрипт на Canvas или отдельный GameObject.
-/// 4. Назначьте панели, TopicListUI и StoryEditorUI в инспекторе.
+/// 1. Canvas (Screen Space - Overlay, Sort Order = 50).
+/// 2. Внутри — TopicListPanel и StoryEditorPanel.
+/// 3. Назначьте bootAnimation (на спрайте ПК) и endShiftButton.
 /// </summary>
 public class ComputerManager : MonoBehaviour
 {
@@ -20,22 +18,23 @@ public class ComputerManager : MonoBehaviour
     [Header("UI Scripts")]
     [SerializeField] private TopicListUI topicListUI;
     [SerializeField] private StoryEditorUI storyEditorUI;
+    [SerializeField] private EndShiftButton endShiftButton;
 
     [Header("Topics")]
     [SerializeField] private StoryTopic[] availableTopics;
 
-    /// <summary>
-    /// Статический флаг — открыт ли компьютер.
-    /// GameplayManager проверяет его, чтобы не открывать паузу.
-    /// </summary>
+    [Header("Boot Animation")]
+    [SerializeField] private ComputerBootAnimation bootAnimation;
+
     public static bool IsOpen { get; private set; }
 
-    private enum Screen { Closed, TopicList, StoryEditor }
+    private enum Screen { Closed, Booting, TopicList, StoryEditor }
     private Screen _currentScreen = Screen.Closed;
 
     private void Start()
     {
         CloseAll();
+        bootAnimation?.ShowOff();
     }
 
     private void Update()
@@ -49,37 +48,43 @@ public class ComputerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Открывает компьютер (каталог тем). Вызывается из ComputerPowerButton.
+    /// Открывает компьютер. Сперва проигрывается анимация загрузки.
     /// </summary>
     public void OpenComputer()
     {
         if (IsOpen) return;
 
-        ShowTopicList();
+        IsOpen = true;
+        _currentScreen = Screen.Booting;
+
+        if (bootAnimation != null)
+        {
+            bootAnimation.PlayBoot(() => ShowTopicList());
+        }
+        else
+        {
+            ShowTopicList();
+        }
     }
 
-    /// <summary>
-    /// Вызывается из TopicListUI когда игрок выбрал тему.
-    /// </summary>
     public void OpenStoryEditor(StoryTopic topic)
     {
         topicListPanel.SetActive(false);
         storyEditorPanel.SetActive(true);
         _currentScreen = Screen.StoryEditor;
 
-        storyEditorUI.Initialize(topic, OnStorySubmitted);
+        storyEditorUI.Initialize(topic, OnStorySubmitted, OnEditorReturnToCatalog);
     }
 
-    /// <summary>
-    /// Вызывается когда игрок нажал "Отправить" в редакторе.
-    /// </summary>
+    private void OnEditorReturnToCatalog()
+    {
+        ShowTopicList();
+    }
+
     private void OnStorySubmitted(StoryTopic completedTopic)
     {
         completedTopic.isCompleted = true;
-
-        AudioManager.Instance?.PlayButtonClick();
-
-        // Возвращаемся в каталог тем
+        AudioManager.Instance?.PlayPCButton();
         ShowTopicList();
     }
 
@@ -91,21 +96,26 @@ public class ComputerManager : MonoBehaviour
         IsOpen = true;
 
         topicListUI.Populate(availableTopics, this);
+
+        // Обновляем состояние кнопки "Завершить смену"
+        if (endShiftButton != null)
+            endShiftButton.UpdateState();
     }
 
     private void HandleEsc()
     {
-        AudioManager.Instance?.PlayButtonClick();
-
         switch (_currentScreen)
         {
+            case Screen.Booting:
+                // Нельзя прервать загрузку
+                break;
+
             case Screen.StoryEditor:
-                // Из редактора — назад в каталог
-                ShowTopicList();
+                // StoryEditorUI сам обрабатывает Esc
                 break;
 
             case Screen.TopicList:
-                // Из каталога — закрыть компьютер
+                AudioManager.Instance?.PlayPCButton();
                 CloseAll();
                 break;
         }
@@ -118,5 +128,7 @@ public class ComputerManager : MonoBehaviour
 
         _currentScreen = Screen.Closed;
         IsOpen = false;
+
+        bootAnimation?.ShowOff();
     }
 }

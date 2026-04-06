@@ -14,7 +14,12 @@ public class NewspaperItem : InteractableItem
 {
     protected override void OnMenuOpened()
     {
-        // Газета помечается как прочитанная, но спрайт не меняется
         isOpened = true;
+        AudioManager.Instance?.PlayNewspaperOpen();
+    }
+
+    protected override void OnMenuClosed()
+    {
+        AudioManager.Instance?.PlayNewspaperClose();
     }
 }

@@ -57,6 +57,7 @@ public class GameplayManager : MonoBehaviour
     {
         AudioManager.Instance?.PlayButtonClick();
         AudioManager.Instance?.RestoreMusic();
+        AudioManager.Instance?.RestoreAmbient();
 
         if (pauseMenuPanel != null)
             pauseMenuPanel.SetActive(false);
@@ -81,7 +82,9 @@ public class GameplayManager : MonoBehaviour
 
     private void PauseGame()
     {
+        AudioManager.Instance?.PlayPauseMenu();
         AudioManager.Instance?.DimMusic();
+        AudioManager.Instance?.DimAmbient();
 
         if (pauseMenuPanel != null)
             pauseMenuPanel.SetActive(true);

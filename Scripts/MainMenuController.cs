@@ -16,6 +16,11 @@ public class MainMenuController : MonoBehaviour
     public void OnPlayButton()
     {
         AudioManager.Instance?.PlayButtonClick();
+
+        // Сбрасываем прогресс для новой игры
+        if (GameProgressManager.Instance != null)
+            GameProgressManager.Instance.ResetAll();
+
         SceneManager.LoadScene(gameplaySceneName);
     }
 

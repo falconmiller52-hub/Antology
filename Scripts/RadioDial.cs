@@ -18,8 +18,8 @@ public class RadioDial : MonoBehaviour
     [SerializeField] private float minAngle = -150f;
     [Tooltip("Максимальный угол поворота (градусы)")]
     [SerializeField] private float maxAngle = 150f;
-    [Tooltip("Чувствительность вращения к движению мыши")]
-    [SerializeField] private float sensitivity = 200f;
+    [Tooltip("Чувствительность вращения к движению мыши (0.1-1.0 рекомендуется)")]
+    [SerializeField] private float sensitivity = 0.3f;
 
     [Header("Visual")]
     [SerializeField] private SpriteRenderer dialRenderer;
@@ -80,6 +80,7 @@ public class RadioDial : MonoBehaviour
         {
             _isDragging = true;
             _customCursor?.SetGrab();
+            AudioManager.Instance?.PlayRadioTuning();
         }
 
         // Процесс вращения
@@ -88,8 +89,9 @@ public class RadioDial : MonoBehaviour
             if (Mouse.current.leftButton.isPressed)
             {
                 // Дельта мыши — вертикальное движение вращает ручку
+                // Без Time.deltaTime — прямая связь с движением мыши
                 Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-                float rotationDelta = mouseDelta.y * sensitivity * Time.deltaTime;
+                float rotationDelta = mouseDelta.y * sensitivity;
 
                 _currentAngle = Mathf.Clamp(_currentAngle + rotationDelta, minAngle, maxAngle);
                 ApplyRotation();

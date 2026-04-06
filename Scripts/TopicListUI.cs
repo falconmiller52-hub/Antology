@@ -53,7 +53,7 @@ public class TopicListUI : MonoBehaviour
                 StoryTopic capturedTopic = topic; // Захват для замыкания
                 button.onClick.AddListener(() =>
                 {
-                    AudioManager.Instance?.PlayButtonClick();
+                    AudioManager.Instance?.PlayPCButton();
                     _computerManager.OpenStoryEditor(capturedTopic);
                 });
             }

@@ -52,7 +52,7 @@ public class ComputerPowerButton : MonoBehaviour
 
         if (hoveringThis && Mouse.current.leftButton.wasPressedThisFrame)
         {
-            AudioManager.Instance?.PlayButtonClick();
+            AudioManager.Instance?.PlayPCPower();
             computerManager?.OpenComputer();
         }
     }

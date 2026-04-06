@@ -37,13 +37,20 @@ public class InterviewCatalogUI : MonoBehaviour
             if (btnText != null)
                 btnText.text = data.npcName;
 
-            // Иконка НПС (если есть дочерний Image с тегом "Icon")
+            // Описание НПС (если есть второй TextMeshProUGUI)
+            TextMeshProUGUI[] texts = btnObj.GetComponentsInChildren<TextMeshProUGUI>();
+            if (texts.Length > 1 && !string.IsNullOrEmpty(data.npcDescription))
+                texts[1].text = data.npcDescription;
+
+            // Иконка НПС — ищем дочерний Image с именем "Icon" или "NpcIcon"
             Image[] images = btnObj.GetComponentsInChildren<Image>();
             foreach (Image img in images)
             {
-                if (img.gameObject != btnObj && data.npcIcon != null)
+                if (img.gameObject != btnObj && data.npcIcon != null
+                    && (img.gameObject.name == "Icon" || img.gameObject.name == "NpcIcon"))
                 {
                     img.sprite = data.npcIcon;
+                    img.preserveAspect = true;
                     break;
                 }
             }

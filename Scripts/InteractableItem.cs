@@ -224,7 +224,6 @@ public class InteractableItem : MonoBehaviour
         AnyMenuOpen = true;
         menuPanel.SetActive(true);
 
-        AudioManager.Instance?.PlayButtonClick();
         OnMenuOpened();
     }
 
@@ -239,16 +238,20 @@ public class InteractableItem : MonoBehaviour
         AnyMenuOpen = false;
         menuPanel.SetActive(false);
 
-        AudioManager.Instance?.PlayButtonClick();
+        OnMenuClosed();
     }
 
-    /// <summary>
-    /// Вызывается после открытия меню.
-    /// Переопределяется в наследниках для смены спрайта (например, у писем).
-    /// </summary>
     protected virtual void OnMenuOpened()
     {
         isOpened = true;
+    }
+
+    /// <summary>
+    /// Вызывается после закрытия меню.
+    /// Переопределяется в наследниках для звуков закрытия.
+    /// </summary>
+    protected virtual void OnMenuClosed()
+    {
     }
 
     private bool IsMouseOverThis(Vector2 worldPoint)

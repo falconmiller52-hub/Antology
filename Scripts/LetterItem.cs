@@ -36,9 +36,14 @@ public class LetterItem : InteractableItem
     protected override void OnMenuOpened()
     {
         base.OnMenuOpened();
+        AudioManager.Instance?.PlayLetterOpen();
 
-        // Сразу обновляем спрайт на "раскрытый"
         if (openedSprite != null)
             spriteRenderer.sprite = openedOutlineSprite != null ? openedOutlineSprite : openedSprite;
+    }
+
+    protected override void OnMenuClosed()
+    {
+        AudioManager.Instance?.PlayLetterClose();
     }
 }
