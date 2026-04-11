@@ -146,15 +146,46 @@ public class BroadcastScene : MonoBehaviour
     private void OnBroadcastEnd()
     {
         _isDone = true;
+        Debug.Log("[Broadcast] Broadcast ended. Attempting to finish...");
 
         SceneFadeOut fader = FindFirstObjectByType<SceneFadeOut>();
         if (fader != null)
         {
-            fader.FadeAndExecute(() => GameProgressManager.Instance?.OnBroadcastFinished());
+            Debug.Log("[Broadcast] FadeOut found, fading...");
+            fader.FadeAndExecute(() =>
+            {
+                if (GameProgressManager.Instance != null)
+                {
+                    GameProgressManager.Instance.OnBroadcastFinished();
+                }
+                else
+                {
+                    Debug.LogWarning("[Broadcast] GameProgressManager is NULL, quitting directly.");
+                    QuitGame();
+                }
+            });
         }
         else
         {
-            GameProgressManager.Instance?.OnBroadcastFinished();
+            Debug.Log("[Broadcast] No FadeOut found, finishing directly.");
+            if (GameProgressManager.Instance != null)
+            {
+                GameProgressManager.Instance.OnBroadcastFinished();
+            }
+            else
+            {
+                Debug.LogWarning("[Broadcast] GameProgressManager is NULL, quitting directly.");
+                QuitGame();
+            }
         }
+    }
+
+    private void QuitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }

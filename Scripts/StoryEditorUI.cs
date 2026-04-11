@@ -295,7 +295,7 @@ public class StoryEditorUI : MonoBehaviour
 
         if (slotText != null)
         {
-            slotText.text = _currentTopic.blocks[index].blockLabel + ": " + phrase;
+            slotText.text = _currentTopic.blocks[index].blockLabel + ": Done";
             slotText.color = filledTextColor;
         }
 

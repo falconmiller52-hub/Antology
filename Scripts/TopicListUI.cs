@@ -37,7 +37,7 @@ public class TopicListUI : MonoBehaviour
         // Создаём кнопку для каждой незавершённой темы
         foreach (StoryTopic topic in topics)
         {
-            if (topic.isCompleted) continue;
+            if (topic == null || topic.isCompleted) continue;
 
             GameObject buttonObj = Instantiate(topicButtonPrefab, topicContainer);
 

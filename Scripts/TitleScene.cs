@@ -58,14 +58,17 @@ public class TitleScene : MonoBehaviour
                 yield return new WaitForSeconds(pauseBetween);
         }
 
-        // Переход в главное меню
+        // После титров — закрываем игру
         yield return new WaitForSeconds(1f);
 
-        // Сбрасываем прогресс для новой игры
         if (GameProgressManager.Instance != null)
             GameProgressManager.Instance.ResetAll();
 
-        SceneManager.LoadScene(mainMenuScene);
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private IEnumerator FadeText(float from, float to, float duration)

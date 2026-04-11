@@ -537,6 +537,7 @@ MonoBehaviour:
   gameplayMusic: {fileID: 8300000, guid: 9df7998875faf5943a6aea256c266d89, type: 3}
   intermediaMusic: {fileID: 8300000, guid: da459975b9f1cd646a9b59a6702b330f, type: 3}
   endingMusic: {fileID: 8300000, guid: dd7f06e623d23b842a1fd39607de6be5, type: 3}
+  titleMusic: {fileID: 0}
   gameplayAmbient: {fileID: 8300000, guid: e68a37b2c25a2f2439410be851233e0e, type: 3}
   buttonClickSFX: {fileID: 8300000, guid: fc6c66d6aba58d3488897bc46983e098, type: 3}
   pauseMenuSFX: {fileID: 8300000, guid: 01a79f2f7b0ab134bb52f3ad7a5df8c2, type: 3}
@@ -1957,9 +1958,8 @@ MonoBehaviour:
   broadcastText: {fileID: 10766783}
   radioImage: {fileID: 1387136494}
   greetingLines:
-  - Hello everyone!
-  farewellLines:
-  - Goodbye!
+  - "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0435\u043D\u0438\u0435 \u0441\u043B\u0435\u0434\u0443\u0435\u0442..."
+  farewellLines: []
   typeSpeed: 0.04
 --- !u!1 &1663882655
 GameObject:

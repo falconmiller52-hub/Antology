@@ -121,8 +121,11 @@ public class GameProgressManager : MonoBehaviour
 
         if (CurrentDay > totalDays)
         {
-            string endingScene = (FactionBScore > FactionAScore) ? endingBScene : endingAScene;
-            SceneManager.LoadScene(endingScene);
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
         }
         else
         {
