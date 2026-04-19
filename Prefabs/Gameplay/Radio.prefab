@@ -143,7 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RadioDial
   minAngle: -150
   maxAngle: 150
-  sensitivity: 200
+  degreesPerWorldUnit: 160
   dialRenderer: {fileID: 7943374257368549379}
   normalSprite: {fileID: 21300000, guid: 0fc26ef038aeb864ea37700b6a1d0b95, type: 3}
   highlightSprite: {fileID: 21300000, guid: dca8e9c8669c7a04f8b29ba1664d2f1a, type: 3}
@@ -303,6 +303,8 @@ MonoBehaviour:
   canvasGroup: {fileID: 6648896493932311989}
   typeSpeed: 0.04
   charsPerBlip: 2
+  normalLineColor: {r: 1, g: 1, b: 1, a: 1}
+  intelLineColor: {r: 1, g: 0.6, b: 0.6, a: 1}
 --- !u!1 &6540233335630073401
 GameObject:
   m_ObjectHideFlags: 0
@@ -840,7 +842,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RadioDial
   minAngle: -150
   maxAngle: 150
-  sensitivity: 200
+  degreesPerWorldUnit: 180
   dialRenderer: {fileID: 7756723618230741991}
   normalSprite: {fileID: 21300000, guid: 0fc26ef038aeb864ea37700b6a1d0b95, type: 3}
   highlightSprite: {fileID: 21300000, guid: dca8e9c8669c7a04f8b29ba1664d2f1a, type: 3}
@@ -963,4 +965,4 @@ MonoBehaviour:
   hearingRadius: 0.25
   dialoguePanel: {fileID: 3254903264835441379}
   allMessages:
-  - {fileID: 11400000, guid: 19bb727869e6ba947ae395e5f6ebab11, type: 2}
+  - {fileID: 11400000, guid: 5a6f94395ce165e4489ab2384f0c5a2e, type: 2}

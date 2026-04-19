@@ -130,9 +130,9 @@ GameObject:
   - component: {fileID: 26147643}
   - component: {fileID: 26147646}
   - component: {fileID: 26147645}
-  - component: {fileID: 26147644}
+  - component: {fileID: 26147647}
   m_Layer: 5
-  m_Name: StoryEditorPanel
+  m_Name: StoryMapPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -151,9 +151,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 46998019}
-  - {fileID: 175137715}
-  - {fileID: 1519739122}
   - {fileID: 2084854373}
+  - {fileID: 1801071529}
   m_Father: {fileID: 317258309}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -161,37 +160,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &26147644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 26147642}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41c168ed34753954694d6ebd90aa3461, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StoryEditorUI
-  blocksContainer: {fileID: 115710600}
-  blockSlotPrefab: {fileID: 2313129189314694417, guid: 5cb27793e63862e4dae7a1fed0d31a92, type: 3}
-  phrasesContainer: {fileID: 1566510065}
-  phraseButtonPrefab: {fileID: 6273469796300718918, guid: cf41eae69dad08d4b87de234fef55c42, type: 3}
-  submitButton: {fileID: 2084854374}
-  topicTitleText: {fileID: 46998020}
-  emptyBlockColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.8}
-  activeBlockColor: {r: 0.4, g: 0.6, b: 0.4, a: 1}
-  filledBlockColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.9}
-  emptyTextColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  activeTextColor: {r: 0.8, g: 1, b: 0.8, a: 1}
-  filledTextColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  phraseNormalColor: {r: 0.18, g: 0.18, b: 0.18, a: 1}
-  phraseHoverColor: {r: 0.25, g: 0.4, b: 0.25, a: 1}
-  phrasePressedColor: {r: 0.15, g: 0.3, b: 0.15, a: 1}
-  phraseTextNormalColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  phraseTextHoverColor: {r: 0.9, g: 1, b: 0.9, a: 1}
-  lockedTextColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
-  lockedBlockColor: {r: 0.12, g: 0.12, b: 0.12, a: 0.6}
 --- !u!114 &26147645
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,6 +198,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 26147642}
   m_CullTransparentMesh: 1
+--- !u!114 &26147647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26147642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50a5b69d610bec34cb3baa06386416f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StoryMapUI
+  mapArea: {fileID: 1801071529}
+  nodesContainer: {fileID: 532354421}
+  connectionsContainer: {fileID: 380883514}
+  nodePrefab: {fileID: 4568142488074485520, guid: 43f377eab6d05de478aef713f69559cc, type: 3}
+  connectionPrefab: {fileID: 2562884094563311620, guid: 0428bf373d8964643bedc13b6f6e258c, type: 3}
+  submitButton: {fileID: 2084854374}
+  topicTitleText: {fileID: 46998020}
 --- !u!1001 &28902825
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -729,68 +716,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 54371056}
   m_CullTransparentMesh: 1
---- !u!1 &115710599
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 115710600}
-  - component: {fileID: 115710601}
-  m_Layer: 5
-  m_Name: BlocksContainer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &115710600
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 115710599}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 175137715}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 27.583, y: -88.77675}
-  m_SizeDelta: {x: 877.5993, y: 686.6776}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &115710601
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 115710599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!1 &121731547
 GameObject:
   m_ObjectHideFlags: 0
@@ -1041,82 +966,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!1 &175137714
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 175137715}
-  - component: {fileID: 175137717}
-  - component: {fileID: 175137716}
-  m_Layer: 5
-  m_Name: LeftPanel
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &175137715
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 175137714}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 115710600}
-  m_Father: {fileID: 26147643}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -505.63, y: -74.20001}
-  m_SizeDelta: {x: -1219.4, y: -397.19}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &175137716
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 175137714}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &175137717
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 175137714}
-  m_CullTransparentMesh: 1
 --- !u!1 &272003339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1571,6 +1420,41 @@ Transform:
   - {fileID: 2133925536}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &380883513
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 380883514}
+  m_Layer: 5
+  m_Name: ConnectionsContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &380883514
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380883513}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1801071529}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -527, y: 458}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &381467546
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2088,6 +1972,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 531350852}
   m_CullTransparentMesh: 1
+--- !u!1 &532354420
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 532354421}
+  m_Layer: 5
+  m_Name: NodesContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &532354421
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 532354420}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1801071529}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -527, y: 458}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &585416689
 GameObject:
   m_ObjectHideFlags: 0
@@ -2211,7 +2130,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -70.65845, y: -14.259155, z: 0, w: 9.937927}
+  m_margin: {x: -64.60266, y: -14.259155, z: 13.753784, w: 34.227234}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -3007,10 +2926,7 @@ MonoBehaviour:
   catalogUI: {fileID: 1331530404}
   dialogueUI: {fileID: 272003341}
   availableInterviews:
-  - {fileID: 11400000, guid: fcc476bc85d611b4789486b8e166029a, type: 2}
   - {fileID: 11400000, guid: 2d2dad658049fd848aa5e1c32c75a0ef, type: 2}
-  - {fileID: 11400000, guid: aedd9fddb98c3734786a06b0082a4906, type: 2}
-  - {fileID: 11400000, guid: cd638d81d0e14064ba95b5a7c2a64145, type: 2}
   microphoneButton: {fileID: 28902826}
 --- !u!4 &910345117
 Transform:
@@ -3424,8 +3340,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0023499, y: 65.62}
-  m_SizeDelta: {x: 1331.6, y: 193.24}
+  m_AnchoredPosition: {x: -17, y: 40.5}
+  m_SizeDelta: {x: 1401, y: 218}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1074874539
 MonoBehaviour:
@@ -3445,7 +3361,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 0
+  m_Spacing: -30.53
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -4104,6 +4020,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 292102453}
+  - {fileID: 1655442893}
+  - {fileID: 1804255449}
   m_Father: {fileID: 1419220365}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4559,144 +4477,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e22958b3d6536a546b1305b3d4c8a4ff, type: 3}
---- !u!1 &1519739121
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1519739122}
-  - component: {fileID: 1519739124}
-  - component: {fileID: 1519739123}
-  m_Layer: 5
-  m_Name: RightPanel
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1519739122
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1519739121}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1566510065}
-  m_Father: {fileID: 26147643}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 377.23004, y: -74.19934}
-  m_SizeDelta: {x: -854.8359, y: -397.1948}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1519739123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1519739121}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1519739124
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1519739121}
-  m_CullTransparentMesh: 1
---- !u!1 &1566510064
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1566510065}
-  - component: {fileID: 1566510066}
-  m_Layer: 5
-  m_Name: PhrasesContainer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1566510065
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1566510064}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1519739122}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00049973, y: 0.0006904602}
-  m_SizeDelta: {x: 1065.2, y: 682.81}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1566510066
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1566510064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: -45.65
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!1 &1588749879
 GameObject:
   m_ObjectHideFlags: 0
@@ -4886,6 +4666,101 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7855152971112693804, guid: e32a14a5c2377b94c9878dd03457f814, type: 3}
   m_PrefabInstance: {fileID: 1191694983}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1655442892
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1655442893}
+  - component: {fileID: 1655442896}
+  - component: {fileID: 1655442895}
+  - component: {fileID: 1655442894}
+  m_Layer: 5
+  m_Name: Image (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1655442893
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1655442892}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1331530401}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 740.4, y: -0.8295288}
+  m_SizeDelta: {x: 434.4, y: 1093.5475}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1655442894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1655442892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35b6d6ca5dc24d44182c4fb42958e38b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuCloseZone
+  mode: 0
+  targetItem: {fileID: 0}
+  targetInterviewManager: {fileID: 910345116}
+  onClose:
+    m_PersistentCalls:
+      m_Calls: []
+  updateCursor: 1
+--- !u!114 &1655442895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1655442892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1655442896
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1655442892}
+  m_CullTransparentMesh: 1
 --- !u!1 &1659265558
 GameObject:
   m_ObjectHideFlags: 0
@@ -5210,15 +5085,185 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ComputerManager
   topicListPanel: {fileID: 2134047351}
-  storyEditorPanel: {fileID: 26147642}
+  storyMapPanel: {fileID: 26147642}
   topicListUI: {fileID: 2134047355}
-  storyEditorUI: {fileID: 26147644}
+  storyMapUI: {fileID: 26147647}
   endShiftButton: {fileID: 1065918667}
   availableTopics:
-  - {fileID: 11400000, guid: 547da6fc2da9ff3408d43e2cf1acaad8, type: 2}
-  - {fileID: 11400000, guid: d2d09902baa5a3646a5b26c7d8134a91, type: 2}
-  - {fileID: 11400000, guid: d886e09100c376246ad7b12c604414ca, type: 2}
+  - {fileID: 11400000, guid: e34861102b06e2b479e5c47271d89904, type: 2}
   bootAnimation: {fileID: 966234343}
+--- !u!1 &1801071528
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1801071529}
+  - component: {fileID: 1801071531}
+  - component: {fileID: 1801071530}
+  m_Layer: 5
+  m_Name: MapArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1801071529
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1801071528}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 532354421}
+  - {fileID: 380883514}
+  m_Father: {fileID: 26147643}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 527, y: -458}
+  m_SizeDelta: {x: -1467.7449, y: -995.2022}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1801071530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1801071528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1801071531
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1801071528}
+  m_CullTransparentMesh: 1
+--- !u!1 &1804255448
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1804255449}
+  - component: {fileID: 1804255452}
+  - component: {fileID: 1804255451}
+  - component: {fileID: 1804255450}
+  m_Layer: 5
+  m_Name: Image (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1804255449
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804255448}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1331530401}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -741.4, y: -0.8295288}
+  m_SizeDelta: {x: 436.4, y: 1093.5475}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1804255450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804255448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35b6d6ca5dc24d44182c4fb42958e38b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuCloseZone
+  mode: 0
+  targetItem: {fileID: 0}
+  targetInterviewManager: {fileID: 910345116}
+  onClose:
+    m_PersistentCalls:
+      m_Calls: []
+  updateCursor: 1
+--- !u!114 &1804255451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804255448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1804255452
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804255448}
+  m_CullTransparentMesh: 1
 --- !u!1 &1884177696
 GameObject:
   m_ObjectHideFlags: 0
@@ -5370,48 +5415,23 @@ MonoBehaviour:
   charsPerBlip: 2
   blocks:
   - lines:
-    - "\u0417\u0434\u0430\u0440\u043E\u0432\u0430! \u0420\u0430\u0434 \u043E\u043A\u0430\u0437\u0430\u0442\u044C\u0441\u044F
-      \u043D\u0430 \u0440\u0430\u0431\u043E\u0447\u0435\u043C \u043C\u0435\u0441\u0442\u0435?"
-    - "\u0421\u043A\u0430\u0436\u0438 \u0441\u043F\u0430\u0441\u0438\u0431\u043E,
-      \u0447\u0442\u043E \u0443\u0433\u043E\u0432\u043E\u0440\u0438\u043B \u043F\u0440\u043E\u0448\u043B\u043E\u0433\u043E
-      \u043C\u0443\u0436\u0438\u043A\u0430 \u043E\u0441\u0432\u043E\u0431\u043E\u0434\u0438\u0442\u044C
-      \u0442\u0435\u0431\u0435 \u043C\u0435\u0441\u0442\u043E"
-    - "\u0422\u044B \u0435\u0433\u043E \u0437\u0430\u0441\u043B\u0443\u0436\u0438\u043B,
-      \u0441\u0442\u0430\u0440\u0438\u043D\u0430... "
-    - "\u0422\u0435\u043F\u0435\u0440\u044C \u043D\u0435 \u0431\u0443\u0434\u0435\u0448\u044C
-      \u043C\u0443\u0447\u0438\u0442\u044C\u0441\u044F \u0432 \u043F\u0440\u043E\u0432\u043E\u0434\u0430\u0445
-      \u0438 \u043A\u043E\u043F\u0430\u0442\u044C\u0441\u044F \u0432 \u0440\u0430\u0434\u0438\u043E,
-      \u0434\u0430?"
-    - "\u041B\u0430\u0434\u043D\u043E, \u0440\u0430\u0437 \u0443\u0436 \u0442\u044B
-      \u0431\u044B\u0432\u0448\u0438\u0439 \"\u0440\u0430\u0434\u0438\u043E-\u0438\u043D\u0436\u0435\u043D\u0435\u0440\",
-      \u0442\u043E \u0440\u0430\u0431\u043E\u0442\u0435\u043D\u043A\u0430 \u0440\u0430\u0434\u0438\u0439\u0449\u0438\u043A\u0430
-      \u0442\u0435\u0431\u0435 \u043F\u043E\u043D\u0440\u0430\u0432\u0438\u0442\u0441\u044F"
-    - "\u0422\u0432\u043E\u044F \u0437\u0430\u0434\u0430\u0447\u0430 \u0442\u0435\u043F\u0435\u0440\u044C
-      \u0432 \u043E\u0441\u043D\u043E\u0432\u043D\u043E\u043C \u0438\u0441\u043A\u0430\u0442\u044C
+    - "\u0417\u0434\u0430\u0440\u043E\u0432\u0430! \u041A\u0430\u043A \u0442\u0435\u0431\u0435
+      \u043D\u043E\u0432\u043E\u0435 \u0440\u0430\u0431\u043E\u0447\u0435\u0435 \u043C\u0435\u0441\u0442\u043E?"
+    - "\u0420\u0430\u0437 \u0443\u0436 \u0442\u044B \u0443 \u043D\u0430\u0441 \u043D\u043E\u0432\u044B\u0439
+      \u0440\u0430\u0434\u0438\u0439\u0449\u0438\u043A, \u0442\u043E \u0434\u0430\u0432\u0430\u0439
+      \u0440\u0430\u0441\u0441\u043A\u0430\u0436\u0443 \u0447\u0442\u043E \u0442\u0443\u0442
+      \u0434\u0430 \u043A\u0430\u043A..."
+    - "\u0422\u0432\u043E\u044F \u0440\u0430\u0431\u043E\u0442\u0430 \u0442\u0435\u043F\u0435\u0440\u044C
+      \u0441\u043E\u0441\u0442\u043E\u0438\u0442 \u0432 \u0442\u043E\u043C, \u0447\u0442\u043E\u0431\u044B
       \u0438\u043D\u0444\u0443 \u0438 \u043A\u043B\u0435\u043F\u0430\u0442\u044C
       \u0441\u044E\u0436\u0435\u0442\u044B \u0434\u043B\u044F \u0440\u0430\u0434\u0438\u043E
       \u044D\u0444\u0438\u0440\u0430"
-    - "\u041E\u0437\u0432\u0443\u0447\u0438\u0432\u0430\u0442\u044C \u043D\u0438\u0447\u0435\u0433\u043E
-      \u043D\u0435 \u043D\u0430\u0434\u043E, \u0442\u0432\u043E\u044F \u0437\u0430\u0434\u0430\u0447\u0430
-      - \u043F\u0438\u0441\u0430\u0442\u044C \u0442\u0435\u043A\u0441\u0442 \u0438
-      \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u044F\u0442\u044C \u0435\u0433\u043E"
-    - "\u041F\u0440\u043E\u0449\u0435 \u043D\u0435\u043A\u0443\u0434\u0430, \u0441\u043A\u0430\u0436\u0438?
-      \u041D\u043E \u0432\u0441\u0435 \u0440\u0430\u0432\u043D\u043E \u043D\u0443\u0436\u043D\u043E
-      \u0431\u044B\u0442\u044C \u043E\u0441\u0442\u043E\u0440\u043E\u0436\u043D\u0435\u0435"
-    - "\u0421\u0430\u043C \u0437\u043D\u0430\u0435\u0448\u044C, \u0432\u0440\u0435\u043C\u0435\u043D\u0430
-      \u0441\u0435\u0439\u0447\u0430\u0441 \u043D\u0435 \u043B\u0443\u0447\u0448\u0438\u0435,
-      \u0434\u043E \u0441\u0438\u0445 \u043F\u043E\u0440 \u0438\u043D\u043E\u0433\u0434\u0430
-      \u0432\u043C\u0435\u0441\u0442\u043E \u0441\u043D\u0435\u0433\u0430 \u043F\u0435\u043F\u0435\u043B
-      \u043B\u0435\u0442\u0438\u0442, 5 \u043B\u0435\u0442 \u043F\u0440\u043E\u0448\u043B\u043E
-      \u0441 \u0442\u043E\u0439 \u0432\u043E\u0439\u043D\u044B, \u0430 \u0432\u0441\u0435
-      \u043E\u0434\u043D\u043E. "
-    - "\u0415\u0434\u044B \u043C\u0430\u043B\u043E, \u0445\u043E\u043B\u043E\u0434
-      \u043A\u0440\u0443\u0433\u043E\u043C, \u0433\u043E\u0440\u043E\u0434\u043E\u0432
-      \u0432 \u043C\u0438\u0440\u0435 \u043A\u0430\u043A \u043D\u0430\u0448 \u043E\u0441\u0442\u0430\u043B\u043E\u0441\u044C
-      \u043D\u0435 \u0442\u0430\u043A \u043C\u043D\u043E\u0433\u043E"
-    - "\u041B\u0430\u0434\u043D\u043E, \u043D\u0435 \u043E \u0442\u043E\u043C \u044F.
-      \u0414\u0430\u0432\u0430\u0439-\u043A\u0430 \u043E\u0431\u044A\u044F\u0441\u043D\u044E
-      \u0447\u0442\u043E \u0442\u0443\u0442 \u0434\u0430 \u043A\u0430\u043A"
+    - "\u0418\u0449\u0435\u0448\u044C, \u043F\u0438\u0448\u0435\u0448\u044C \u0438
+      \u043F\u0443\u0441\u043A\u0430\u0435\u0448\u044C \u0432 \u044D\u0444\u0438\u0440,
+      \u043A\u0430\u043A \u0434\u0432\u0430 \u043F\u0430\u043B\u044C\u0446\u0430!"
+    waitForEvent: 0
+    unlockZone: 0
+  - lines:
     - "\u0412\u0438\u0434\u0438\u0448\u044C \u043F\u0438\u0441\u044C\u043C\u0430
       \u043D\u0430 \u043B\u043E\u0442\u043A\u0435? \u042D\u0442\u043E \u043D\u0430\u0448\u0438
       \u0441\u043B\u0443\u0448\u0430\u0442\u0435\u043B\u0438 \u043F\u0440\u0438\u0441\u044B\u043B\u0430\u044E\u0442
@@ -5420,15 +5440,6 @@ MonoBehaviour:
       \u0432\u0441\u0435\u0433\u043E... \u041D\u043E \u043E\u043D\u043E \u0438 \u043F\u043E\u043D\u044F\u0442\u043D\u043E,
       \u043D\u0430\u0440\u043E\u0434 \u0433\u043E\u0432\u043E\u0440\u0438\u0442 \u0432\u0441\u0435
       \u043A\u0430\u043A \u0435\u0441\u0442\u044C"
-    - "\u0417\u0434\u0435\u0441\u044C \u0441\u043C\u043E\u0436\u0435\u0448\u044C
-      \u043D\u0430\u0439\u0442\u0438 \u043D\u0435 \u0442\u043E\u043B\u044C\u043A\u043E
-      \u0438\u043D\u0444\u043E\u043F\u043E\u0432\u043E\u0434\u044B, \u043D\u043E
-      \u0438 \u0443\u0433\u0440\u043E\u0437\u044B, \u043C\u043E\u043B\u044C\u0431\u044B
-      \u043E \u043F\u043E\u043C\u043E\u0449\u0438, \u043D\u0438\u0433\u0435\u0440\u0438\u0439\u0441\u043A\u0438\u0435
-      \u043F\u0438\u0441\u044C\u043C\u0430"
-    - "\u0418 \u043F\u0440\u043E\u0447\u0443\u044E \u0447\u0443\u0448\u044C... \u041F\u043E\u0432\u0435\u0440\u044C,
-      \u0444\u0430\u043D\u0442\u0430\u0437\u0438\u0438 \u0443 \u043B\u044E\u0434\u0435\u0439
-      \u043C\u043D\u043E\u0433\u043E"
     - "\u041F\u043E\u043F\u0440\u043E\u0431\u0443\u0439 \u043F\u043E\u0447\u0438\u0442\u0430\u0442\u044C
       \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C \u0438 \u0432\u044B\u0434\u0435\u043B\u0438\u0442\u044C
       \u0438\u043D\u0442\u0435\u0440\u0435\u0441\u043D\u044B\u0435 \u0444\u0440\u0430\u0437\u044B,
@@ -5436,163 +5447,107 @@ MonoBehaviour:
     waitForEvent: 1
     unlockZone: 1
   - lines:
+    - "\u0418\u043D\u0442\u0435\u0440\u0435\u0441\u043D\u043E\u0435 \u0447\u0442\u0438\u0432\u043E,
+      \u0434\u0430?"
+    waitForEvent: 0
+    unlockZone: 0
+  - lines:
     - "\u0425\u043E\u0440\u043E\u0448\u043E, \u0434\u0430\u0432\u0430\u0439-\u043A\u0430
       \u0442\u0435\u043F\u0435\u0440\u044C \u043F\u0440\u043E\u0447\u0442\u0435\u043C
       \u0433\u0430\u0437\u0435\u0442\u043A\u0443, \u0432 \u043D\u0438\u0445 \u043E\u0431\u044B\u0447\u043D\u043E
       \u0431\u043E\u043B\u0435\u0435-\u043C\u0435\u043D\u0435\u0435 \u0432\u0441\u0435
       \u0433\u0440\u0430\u043C\u043E\u0442\u043D\u043E"
-    - "\u041D\u043E \u043D\u0435 \u0437\u0430\u0431\u044B\u0432\u0430\u0439, \u044D\u0442\u043E
-      \u043D\u0435 \u0446\u0435\u043D\u0442\u0440\u0430\u043B\u044C\u043D\u043E\u0435
-      \u0432\u0435\u0449\u0430\u043D\u0438\u0435, \u043A\u0430\u043A \u0442\u043E,
-      \u0433\u0434\u0435 \u0442\u044B \u0442\u0435\u043F\u0435\u0440\u044C \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0448\u044C"
-    - "\u041F\u043E\u044D\u0442\u043E\u043C\u0443 \u0438\u043D\u043E\u0433\u0434\u0430
-      \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u0430 \u0442\u0430\u043C \u043D\u0435
-      \u0442\u0430\u043A \u043C\u043D\u043E\u0433\u043E, \u043A\u0430\u043A \u0445\u043E\u0442\u0435\u043B\u043E\u0441\u044C
-      \u0431\u044B"
-    - "\u0410 \u044D\u0442\u043E \u043E\u0447\u0435\u043D\u044C \u0432\u0430\u0436\u043D\u043E
-      \u0434\u043B\u044F \u043B\u044E\u0431\u043E\u0433\u043E \u0441\u044E\u0436\u0435\u0442\u0430!"
-    - "\u0422\u0430\u043A \u0447\u0442\u043E \u0441\u0442\u0430\u0440\u0430\u0439\u0441\u044F
-      \u0438\u0441\u043A\u0430\u0442\u044C \u043A\u0430\u043A \u043C\u043E\u0436\u043D\u043E
-      \u0431\u043E\u043B\u044C\u0448\u0435 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u0438"
     - "\u041E\u0442\u043A\u0440\u043E\u0439 \u043A\u0430\u043A\u0443\u044E-\u043D\u0438\u0431\u0443\u0434\u044C
       \u0433\u0430\u0437\u0435\u0442\u0443 \u0438 \u0442\u043E\u0447\u043D\u043E
       \u0442\u0430\u043A \u0436\u0435 \u0432\u044B\u0434\u0435\u043B\u0438 \u0447\u0442\u043E-\u043D\u0438\u0431\u0443\u0434\u044C
       \u0438\u043D\u0442\u0435\u0440\u0435\u0441\u043D\u043E\u0435"
-    - "\u041D\u0435 \u0431\u043E\u0438\u0441\u044C, \u0435\u0441\u043B\u0438 \u0447\u0442\u043E-\u0442\u043E
-      \u0443\u043F\u0443\u0441\u0442\u0438\u0448\u044C \u0432 \u043F\u0435\u0440\u0432\u044B\u0439
-      \u0440\u0430\u0437, \u0442\u043E \u0432\u0441\u0435\u0433\u0434\u0430 \u0441\u043C\u043E\u0436\u0435\u0448\u044C
-      \u043F\u0435\u0440\u0435\u0447\u0438\u0442\u0430\u0442\u044C "
     waitForEvent: 1
     unlockZone: 2
   - lines:
-    - "\u0421\u0443\u043F\u0435\u0440! \u0421 \u0431\u0443\u043C\u0430\u0433\u043E\u0439
-      \u0442\u044B \u043E\u0431\u0440\u0430\u0449\u0430\u0442\u044C\u0441\u044F \u0443\u043C\u0435\u0435\u0448\u044C,
-      \u044D\u0442\u043E \u0445\u043E\u0440\u043E\u0448\u043E"
-    - "\u041A\u0430\u043A \u043D\u0430\u0441\u0447\u0435\u0442 \u043A\u043E\u043C\u043F\u044C\u044E\u0442\u0435\u0440\u0430?"
+    - "\u041D\u0443 \u0432\u043E\u0442, \u043D\u0435 \u0442\u0430\u043A \u0443\u0436
+      \u0438 \u0441\u043B\u043E\u0436\u043D\u043E, \u0441\u043A\u0430\u0436\u0438? "
+    waitForEvent: 0
+    unlockZone: 0
+  - lines:
+    - "\u041A\u0441\u0442\u0430\u0442\u0438, \u043F\u043E \u0440\u0430\u0434\u0438\u043E
+      \u043A\u0440\u0443\u0442\u044F\u0442 \u043D\u0435 \u0442\u043E\u043B\u044C\u043A\u043E
+      \u043C\u0443\u0437\u044B\u043A\u0443"
+    - "\u0418\u043D\u043E\u0433\u0434\u0430 \u043C\u043E\u0436\u043D\u043E \u0443\u0441\u043B\u044B\u0448\u0430\u0442\u044C
+      \u043E\u0447\u0435\u043D\u044C \u043C\u043D\u043E\u0433\u043E \u0438\u043D\u0442\u0435\u0440\u0435\u0441\u043D\u043E\u0433\u043E"
+    - "\u0413\u043B\u0430\u0432\u043D\u043E\u0435 \u0432\u044B\u043B\u043E\u0432\u0438\u0442\u044C
+      \u0441\u0438\u0433\u043D\u0430\u043B... "
+    - "\u041D\u0443-\u043A\u0430 \u043F\u043E\u043F\u0440\u043E\u0431\u0443\u0439
+      \u043D\u0430\u0441\u0442\u0440\u043E\u0438\u0442\u044C \u0447\u0430\u0441\u0442\u043E\u0442\u044B,
+      \u043F\u0440\u043E\u0441\u0442\u043E \u043F\u043E\u043A\u0440\u0443\u0442\u0438!"
+    waitForEvent: 3
+    unlockZone: 4
+  - lines:
+    - "\u041A\u0430\u043A \u0434\u0432\u0430 \u043F\u0430\u043B\u044C\u0446\u0430!"
+    waitForEvent: 0
+    unlockZone: 0
+  - lines:
+    - "\u041F\u043E \u0440\u0430\u0434\u0438\u043E \u0442\u044B \u0441\u043C\u043E\u0436\u0435\u0448\u044C
+      \u043E\u043F\u0440\u0430\u0448\u0438\u0432\u0430\u0442\u044C \u0434\u0440\u0443\u0433\u0438\u0445
+      \u043B\u044E\u0434\u0435\u0439"
+    - "\u0422\u0430\u043C \u0438\u043D\u043E\u0433\u0434\u0430 \u0441\u0442\u043E\u043B\u044C\u043A\u043E
+      \u0432\u0441\u0435\u0433\u043E... \u041D\u043E \u043E\u043D\u043E \u0438 \u043F\u043E\u043D\u044F\u0442\u043D\u043E,
+      \u043D\u0430\u0440\u043E\u0434 \u0433\u043E\u0432\u043E\u0440\u0438\u0442 \u0432\u0441\u0435
+      \u043A\u0430\u043A \u0435\u0441\u0442\u044C"
+    - "\u0414\u043B\u044F \u043D\u0430\u0447\u0430\u043B\u0430 \u0432\u043A\u043B\u044E\u0447\u0438
+      \u043C\u0438\u043A\u0440\u043E\u0444\u043E\u043D \u0438 \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0441\u044C,
+      \u0441 \u043A\u0435\u043C \u0445\u043E\u0447\u0435\u0448\u044C \u0431\u0440\u0430\u0442\u044C
+      \u0438\u043D\u0442\u0435\u0440\u0432\u044C\u044E..."
+    - "\u041F\u043E\u043F\u0440\u043E\u0431\u0443\u0439 \u0432\u044B\u0437\u0432\u0430\u0442\u044C
+      \u041A\u0438\u0440\u0438\u043B\u043B\u0430 \u041D\u0438\u043A\u043E\u043B\u0430\u0435\u0432\u0430,
+      \u043E\u043D \u0433\u043B\u0430\u0432\u0430 \u0434\u0435\u043B\u0435\u0433\u0430\u0446\u0438\u0438,
+      \u043D\u0435\u0434\u0430\u0432\u043D\u043E \u0445\u043E\u0434\u0438\u043B\u0438
+      \u043D\u0430 \u0432\u0441\u0442\u0440\u0435\u0447\u0443 \u043A \u0434\u0440\u0443\u0433\u043E\u043C\u0443
+      \u0433\u043E\u0440\u043E\u0434\u0443"
+    - "\u041F\u043E\u0441\u043F\u0440\u0430\u0448\u0438\u0432\u0430\u0439 \u043A\u0430\u043A
+      \u0442\u0430\u043C \u0432\u0441\u0435 \u043F\u0440\u043E\u0448\u043B\u043E"
+    waitForEvent: 4
+    unlockZone: 5
+  - lines:
+    - "\u0421\u0443\u043F\u0435\u0440! \u0421 \u0440\u0430\u0434\u0438\u043E \u0442\u044B
+      \u043E\u0431\u0440\u0430\u0449\u0430\u0442\u044C\u0441\u044F \u0443\u043C\u0435\u0435\u0448\u044C,
+      \u044D\u0442\u043E \u0445\u043E\u0440\u043E\u0448\u043E. \u041A\u0430\u043A
+      \u043D\u0430\u0441\u0447\u0435\u0442 \u043A\u043E\u043C\u043F\u044C\u044E\u0442\u0435\u0440\u0430?"
+    waitForEvent: 0
+    unlockZone: 0
+  - lines:
     - "\u0412 \u043D\u0435\u043C \u0442\u044B \u0431\u0443\u0434\u0435\u0448\u044C
       \u043F\u0438\u0441\u0430\u0442\u044C \u0442\u0435\u043A\u0441\u0442 \u0434\u043B\u044F
-      \u0441\u044E\u0436\u0435\u0442\u043E\u0432 \u0438 \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u044F\u0442\u044C
-      \u0438\u0445"
+      \u0441\u044E\u0436\u0435\u0442\u043E\u0432 \u0438 \u043F\u0443\u0441\u043A\u0430\u0442\u044C
+      \u0438\u0445 \u0432 \u044D\u0444\u0438\u0440. "
     - "\u0421\u043F\u0435\u0440\u0432\u0430 \u043D\u0443\u0436\u043D\u043E \u0432\u044B\u0431\u0440\u0430\u0442\u044C
       \u0442\u0435\u043C\u0443 \u0434\u043B\u044F \u0441\u044E\u0436\u0435\u0442\u0430
       \u043D\u0430 \u043F\u043E\u0432\u0435\u0441\u0442\u043A\u0443 \u043D\u0430
-      \u0434\u043D\u044F"
-    - "\u0410 \u043F\u043E\u0442\u043E\u043C \u0448\u0430\u0433 \u0437\u0430 \u0448\u0430\u0433\u043E\u043C
-      \u0432\u044B\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0442\u044C \u0442\u0435\u043A\u0441\u0442"
-    - "\u0421\u043B\u0435\u0434\u0438 \u0437\u0430 \u0444\u043E\u0440\u043C\u0443\u043B\u0438\u0440\u043E\u0432\u043A\u0430\u043C\u0438!
-      \u0418\u043D\u043E\u0433\u0434\u0430 \u043E\u0434\u043D\u0443 \u0432\u0435\u0449\u044C
-      \u043C\u043E\u0436\u043D\u043E \u0434\u043E\u043D\u0435\u0441\u0442\u0438 \u043E\u0447\u0435\u043D\u044C
-      \u043F\u043E-\u0440\u0430\u0437\u043D\u043E\u043C\u0443"
-    - "\u0418 \u0442\u0435\u0431\u044F \u043C\u043E\u0433\u0443\u0442 \u043D\u0435
-      \u0442\u0430\u043A \u043F\u043E\u043D\u044F\u0442\u044C... \u0427\u0442\u043E
-      \u043E\u0431\u044B\u0447\u043D\u044B\u0435 \u043B\u044E\u0434\u0438, \u0447\u0442\u043E
-      \u0442\u0432\u043E\u0438 \u043D\u0430\u0447\u0430\u043B\u044C\u043D\u0438\u043A\u0438"
+      \u0434\u043D\u044F, \u0430 \u043F\u043E\u0442\u043E\u043C \u0448\u0430\u0433
+      \u0437\u0430 \u0448\u0430\u0433\u043E\u043C \u0432\u044B\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0442\u044C
+      \u0442\u0435\u043A\u0441\u0442"
     - "\u0412\u043A\u043B\u044E\u0447\u0438 \u043A\u043E\u043C\u043F\u044C\u044E\u0442\u0435\u0440
       \u0438 \u043F\u043E\u043F\u0440\u043E\u0431\u0443\u0439 \u043D\u0430\u043F\u0438\u0441\u0430\u0442\u044C
       \u0442\u0435\u043A\u0441\u0442"
-    - "\u0423\u0447\u0442\u0438, \u0435\u0441\u043B\u0438 \u043D\u0435 \u0445\u0432\u0430\u0442\u0430\u0435\u0442
+    - "\u0415\u0441\u043B\u0438 \u043D\u0435 \u0445\u0432\u0430\u0442\u0430\u0435\u0442
       \u043A\u0430\u043A\u0438\u0445-\u0442\u043E \u0434\u0430\u043D\u043D\u044B\u0445,
       \u0442\u043E \u043F\u043E\u043F\u0440\u043E\u0431\u0443\u0439 \u043F\u0435\u0440\u0435\u0447\u0438\u0442\u0430\u0442\u044C
       \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u044B \u0435\u0449\u0435 \u0440\u0430\u0437!"
     waitForEvent: 2
     unlockZone: 3
   - lines:
-    - "\u041D\u0443 \u0432\u043E\u0442, \u043D\u0435 \u0442\u0430\u043A \u0443\u0436
-      \u0438 \u0441\u043B\u043E\u0436\u043D\u043E, \u0441\u043A\u0430\u0436\u0438?"
+    - "\u0412 \u0446\u0435\u043B\u043E\u043C \u0432\u0441\u0435! \u0412\u0438\u0434\u0438\u0448\u044C,
+      \u043D\u0435 \u0442\u0430\u043A \u0443\u0436 \u0438 \u0441\u043B\u043E\u0436\u043D\u043E?"
     - "\u0412 \u0434\u0435\u043D\u044C \u0442\u0435\u0431\u0435 \u043D\u0443\u0436\u043D\u043E
       \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u044F\u0442\u044C \u043F\u043E 3
       \u0441\u044E\u0436\u0435\u0442\u0430, \u044D\u0442\u043E \u0442\u0432\u043E\u044F
       \u043A\u0432\u043E\u0442\u0430"
-    - "\u041D\u043E \u0435\u0441\u043B\u0438 \u0445\u043E\u0447\u0435\u0448\u044C
-      \u043D\u0430\u043F\u0440\u044F\u0447\u044C\u0441\u044F, \u0442\u043E \u043C\u043E\u0436\u0435\u0448\u044C
-      \u043D\u0430\u043F\u0438\u0441\u0430\u0442\u044C \u0438 \u043F\u043E\u0431\u043E\u043B\u044C\u0448\u0435"
-    - "\u0412\u043E\u0442 \u0442\u043E\u043B\u044C\u043A\u043E \u043F\u0440\u0435\u043C\u0438\u044E
-      \u0437\u0430 \u044D\u0442\u043E \u0442\u0435\u0431\u0435 \u043D\u0435 \u0432\u044B\u0434\u0430\u0434\u0443\u0442,
-      \u0433\u043E\u0432\u043E\u0440\u044E \u043F\u043E \u043E\u043F\u044B\u0442\u0443!"
-    - "\u0417\u043D\u0430\u0435\u0448\u044C, \u043C\u043E\u044F \u043D\u044B\u043D\u0435\u0448\u043D\u044F\u044F
-      \u0440\u0430\u0431\u043E\u0442\u0430 \u0431\u0443\u0434\u0435\u0442 \u043F\u043E\u043B\u0435\u0433\u0447\u0435
-      \u0442\u0432\u043E\u0435\u0439, \u0441\u0438\u0434\u0438\u0448\u044C \u0441\u0435\u0431\u0435
-      \u0434\u0430 \u043E\u0437\u0432\u0443\u0447\u0438\u0432\u0430\u0435\u0448\u044C
-      \u0447\u0442\u043E \u0434\u0430\u044E\u0442"
-    - "\u041D\u043E \u043F\u043E\u0441\u0442\u0430\u0440\u0430\u0439\u0441\u044F
-      \u043F\u0438\u0441\u0430\u0442\u044C \u043D\u043E\u0440\u043C\u0430\u043B\u044C\u043D\u043E,
-      \u0447\u0442\u043E\u0431\u044B \u043C\u043D\u0435 \u043D\u0435 \u043F\u0440\u0438\u0448\u043B\u043E\u0441\u044C
-      \u043A\u0440\u0430\u0441\u043D\u0435\u0442\u044C \u0437\u0430 \u0442\u0435\u0431\u044F"
-    - "\u0410\u0445 \u0434\u0430, \u0432\u043E\u0442 \u0435\u0449\u0435 \u0447\u0442\u043E!"
-    - "\u041F\u043E \u0440\u0430\u0434\u0438\u043E \u043C\u043E\u0436\u043D\u043E
-      \u043F\u043E\u0440\u043E\u0439 \u0443\u0441\u043B\u044B\u0448\u0430\u0442\u044C
-      \u043E\u0447\u0435\u043D\u044C \u043C\u043D\u043E\u0433\u043E \u0438\u043D\u0442\u0435\u0440\u0435\u0441\u043D\u043E\u0433\u043E"
-    - "\u0413\u043B\u0430\u0432\u043D\u043E\u0435 \u0432\u044B\u043B\u043E\u0432\u0438\u0442\u044C
-      \u0441\u0438\u0433\u043D\u0430\u043B. \u0418\u043D\u0436\u0435\u043D\u0435\u0440\u044B
-      \u043D\u0435 \u0442\u043E \u0447\u0442\u043E\u0431\u044B \u043F\u0430\u0440\u0438\u043B\u0438\u0441\u044C
-      \u043D\u0430\u0434 \u0430\u043D\u043E\u043D\u0438\u043C\u043D\u043E\u0441\u0442\u044C\u044E"
-    - "\u041F\u043E\u044D\u0442\u043E\u043C\u0443 \u043F\u043E\u0434\u0441\u043B\u0443\u0448\u0430\u0442\u044C
-      \u0447\u0435\u0439-\u043D\u0438\u0431\u0443\u0434\u044C \u0440\u0430\u0437\u0433\u043E\u0432\u043E\u0440
-      \u0431\u0443\u0434\u0435\u0442 \u043B\u0435\u0433\u0447\u0435 \u043B\u0435\u0433\u043A\u043E\u0433\u043E!"
-    - "\u041F\u043E\u043F\u0440\u043E\u0431\u0443\u0439 \u043D\u0430\u0441\u0442\u0440\u043E\u0438\u0442\u044C
-      \u0447\u0430\u0441\u0442\u043E\u0442\u044B \u0438 \u043F\u0435\u0440\u0435\u0445\u0432\u0430\u0442\u0438\u0442\u044C
-      \u0441\u0438\u0433\u043D\u0430\u043B"
-    - "\u041D\u0443 \u0430 \u044F \u0441\u044F\u0434\u0443 \u0437\u0430 \u0440\u0430\u0431\u043E\u0442\u0443,
-      \u0441\u043C\u0435\u043D\u0430 \u043D\u0435 \u0436\u0434\u0435\u0442!"
-    - "\u0423\u0434\u0430\u0447\u0438 \u043A\u043E\u043B\u043B\u0435\u0433\u0430"
-    waitForEvent: 3
-    unlockZone: 4
-  - lines:
-    - "\u0418 \u0441\u043D\u043E\u0432\u0430 \u0437\u0434\u0430\u0440\u043E\u0432\u0430!"
-    - "\u041D\u0443 \u0447\u0442\u043E, \u0443\u0436\u0435 \u043E\u0441\u0432\u043E\u0438\u043B\u0441\u044F?"
-    - "\u0415\u0441\u0442\u044C \u0434\u0432\u0435 \u043D\u043E\u0432\u043E\u0441\u0442\u0438
-      \u0434\u043B\u044F \u0442\u0435\u0431\u044F, \u043C\u0435\u043D\u044F \u043F\u0440\u043E\u0441\u0438\u043B\u0438
-      \u043F\u0435\u0440\u0435\u0434\u0430\u0442\u044C \u0438\u0445"
-    - "\u041D\u0430\u0447\u043D\u0435\u043C \u0441 \u043F\u043B\u043E\u0445\u043E\u0439...
-      \u041D\u0435\u0434\u0430\u0432\u043D\u043E \u0442\u0443\u0442 \u043F\u043E\u044F\u0432\u0438\u043B\u0438\u0441\u044C
-      \u043B\u044E\u0434\u0438, \u0438\u043C \u043E\u0447\u0435\u043D\u044C \u043D\u0435
-      \u043D\u0440\u0430\u0432\u0438\u0442\u0441\u044F \u043D\u044B\u043D\u0435\u0448\u043D\u0438\u0439
-      \u043F\u043E\u0440\u044F\u0434\u043E\u043A \u0432\u0435\u0449\u0435\u0439"
-    - "\u041F\u043E\u044D\u0442\u043E\u043C\u0443 \u0438 \u0440\u0430\u0441\u043F\u0440\u043E\u0441\u0442\u0440\u0430\u043D\u044F\u044E\u0442
-      \u0430\u0445\u0438\u043D\u0435\u044E, \u0443\u0433\u0440\u043E\u0436\u0430\u044E\u0442,
-      \u0447\u0435\u0440\u0442\u0438 \u0447\u0442\u043E..."
-    - "\u0422\u044B \u043B\u0443\u0447\u0448\u0435 \u0441 \u043D\u0438\u043C\u0438
-      \u043D\u0435 \u043A\u043E\u043D\u0442\u0430\u043A\u0442\u0438\u0440\u0443\u0439,
-      \u043D\u0438\u043A\u043E\u0433\u0434\u0430 \u043D\u0435 \u0437\u043D\u0430\u0435\u0448\u044C
-      \u0447\u0435\u0433\u043E \u043D\u0430\u0442\u0432\u043E\u0440\u0438\u0442\u044C
-      \u043C\u043E\u0433\u0443\u0442"
-    - "\u0414\u0430 \u0438 \u0443 \u043D\u0430\u0447\u0430\u043B\u044C\u0441\u0442\u0432\u0430
-      \u0431\u0443\u0434\u0435\u0442 \u043C\u0435\u043D\u044C\u0448\u0435 \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432
-      \u043A \u0442\u0435\u0431\u0435"
-    - "\u0410 \u0442\u0435\u043F\u0435\u0440\u044C \u0445\u043E\u0440\u043E\u0448\u0430\u044F!
-      \u0422\u0435\u0431\u0435 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u043B\u0438
-      \u043D\u043E\u0432\u0443\u044E \u0430\u043F\u043F\u0430\u0440\u0430\u0442\u0443\u0440\u0443"
-    - "\u0421 \u043D\u0435\u0439 \u0442\u044B \u0441\u043C\u043E\u0436\u0435\u0448\u044C
-      \u0443\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0442\u044C \u0438\u043D\u0442\u0435\u0440\u0432\u044C\u044E
-      \u0438 \u0443\u0437\u043D\u0430\u0432\u0430\u0442\u044C \u0432\u0441\u0435
-      \u043F\u0435\u0440\u0432\u0435\u0435 \u0432\u0441\u0435\u0445!"
-    - "\u0420\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u044D\u0442\u043E \u043F\u0440\u043E\u0441\u0442\u043E,
-      \u0443 \u0442\u0435\u0431\u044F \u0435\u0441\u0442\u044C, \u0441\u043A\u0430\u0436\u0435\u043C
-      \u0442\u0430\u043A, \u0441\u043F\u0438\u0441\u043E\u043A \u043B\u044E\u0434\u0435\u0439.
-      \u0422\u044B \u0431\u043E\u043B\u0442\u0430\u0435\u0448\u044C \u0441 \u043D\u0438\u043C\u0438,
-      \u0437\u0430\u0434\u0430\u0435\u0448\u044C \u0432\u043E\u043F\u0440\u043E\u0441\u044B
-      \u043D\u0430 \u0440\u0430\u0437\u043D\u044B\u0435 \u0442\u0435\u043C\u044B"
-    - "\u0418 \u0432\u0441\u0435 \u043F\u0440\u043E\u0438\u0441\u0445\u043E\u0434\u0438\u0442
-      \u043F\u043E \u0440\u0430\u0434\u0438\u043E\u0441\u0432\u044F\u0437\u0438,
-      \u0434\u0430\u0436\u0435 \u0432\u044B\u0445\u043E\u0434\u0438\u0442\u044C \u0432
-      \u0445\u043E\u043B\u043E\u0434 \u043D\u0438\u043A\u0443\u0434\u0430 \u043D\u0435
-      \u043D\u0443\u0436\u043D\u043E! \u0422\u0435\u0445\u043D\u043E\u043B\u043E\u0433\u0438\u0438!"
-    - "\u041E\u043F\u0440\u043E\u0431\u0443\u0439! \u041F\u043E\u043F\u0440\u043E\u0431\u0443\u0439
-      \u0432\u044B\u0437\u0432\u0430\u0442\u044C \u041A\u0438\u0440\u0438\u043B\u043B\u0430
-      \u041D\u0438\u043A\u043E\u043B\u0430\u0435\u0432\u0430, \u043E\u043D \u0433\u043B\u0430\u0432\u0430
-      \u0434\u0435\u043B\u0435\u0433\u0430\u0446\u0438\u0438, \u043D\u0435\u0434\u0430\u0432\u043D\u043E
-      \u0445\u043E\u0434\u0438\u043B\u0438 \u043D\u0430 \u0432\u0441\u0442\u0440\u0435\u0447\u0443
-      \u043A \u0434\u0440\u0443\u0433\u043E\u043C\u0443 \u0433\u043E\u0440\u043E\u0434\u0443"
-    - "\u041F\u043E\u0441\u043F\u0440\u0430\u0448\u0438\u0432\u0430\u0439 \u043A\u0430\u043A
-      \u0442\u0430\u043C \u0432\u0441\u0435 \u043F\u0440\u043E\u0448\u043B\u043E,
-      \u044D\u0442\u043E \u043A\u0440\u043E\u043C\u0435 \u0446\u0435\u043D\u0442\u0440\u0430\u043B\u044C\u043D\u043E\u0433\u043E
-      \u0440\u0430\u0434\u0438\u043E \u043D\u0438\u043A\u0442\u043E \u043D\u0435
-      \u0441\u043C\u043E\u0436\u0435\u0442 \u0440\u0430\u0441\u0441\u043A\u0430\u0437\u0430\u0442\u044C"
-    waitForEvent: 4
-    unlockZone: 5
+    - "\u041E\u0441\u0432\u0430\u0438\u0432\u0430\u0439\u0441\u044F, \u0440\u0430\u0431\u043E\u0442\u0430\u0439,
+      \u043D\u0443 \u0430 \u044F \u0431\u043E\u043B\u044C\u0448\u0435 \u043D\u0435
+      \u043E\u0442\u0432\u043B\u0435\u043A\u0430\u044E..."
+    waitForEvent: 0
+    unlockZone: 0
   letterObjects:
   - {fileID: 966745234}
-  - {fileID: 0}
   newspaperObjects:
   - {fileID: 1626185534}
   - {fileID: 1433797955}
