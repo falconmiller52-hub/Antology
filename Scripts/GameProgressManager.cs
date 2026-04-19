@@ -6,9 +6,8 @@ using System.Collections.Generic;
 /// Синглтон прогрессии: дни, счётчик сюжетов, очки фракций.
 /// Живёт между сценами (DontDestroyOnLoad).
 ///
-/// Настройка:
-/// 1. Создайте GameObject "GameProgress" в сцене MainMenu.
-/// 2. Повесьте этот скрипт. Он переживёт смену сцен.
+/// 4 фракции (A/B/C/D) — используются новой системой ментальной карты.
+/// Старая система (RegisterStory с 2 фракциями) сохранена для совместимости.
 /// </summary>
 public class GameProgressManager : MonoBehaviour
 {
@@ -29,11 +28,14 @@ public class GameProgressManager : MonoBehaviour
     public int StoriesCompletedToday { get; private set; }
     public int FactionAScore { get; private set; }
     public int FactionBScore { get; private set; }
+    public int FactionCScore { get; private set; }
+    public int FactionDScore { get; private set; }
     public bool CanEndShift => StoriesCompletedToday >= storiesPerDay;
     public int StoriesPerDay => storiesPerDay;
     public int TotalDays => totalDays;
 
-    // Сюжеты за текущий день (каждый сюжет = массив блоков)
+    // Сюжеты за текущий день.
+    // Каждый сюжет = массив строк (текстов broadcast'а по ячейкам цепочки).
     private List<string[]> _todayStoryBlocks = new List<string[]>();
 
     private void Awake()
@@ -48,7 +50,6 @@ public class GameProgressManager : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        // Полный сброс SO при первом создании (на случай грязного состояния в редакторе)
         ResetAllScriptableObjects();
         ResetDay();
     }
@@ -60,24 +61,20 @@ public class GameProgressManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // При входе в Gameplay сцену сбрасываем per-day SO состояния
-        // (isCompleted у StoryTopic сбрасывается, т.к. каждая сцена имеет свои темы)
-        // InterviewData.isCompleted НЕ сбрасываем — интервью per-game
-        // RadioMessage.hasBeenPlayed НЕ сбрасываем — per-game
         if (scene.name.StartsWith("Gameplay"))
         {
-            // Сбрасываем только темы сюжетов (они per-day)
             foreach (var topic in Resources.FindObjectsOfTypeAll<StoryTopic>())
                 topic.ResetState();
 
             Debug.Log($"[GameProgress] Loaded {scene.name}. Day={CurrentDay}, " +
-                      $"Stories={StoriesCompletedToday}, FactionA={FactionAScore}, FactionB={FactionBScore}");
+                      $"Stories={StoriesCompletedToday}, " +
+                      $"A={FactionAScore} B={FactionBScore} C={FactionCScore} D={FactionDScore}");
         }
     }
 
     /// <summary>
-    /// Вызывается из StoryEditorUI после отправки сюжета.
-    /// blocks — массив заполненных фраз (по блокам).
+    /// Устаревший метод: старая система с 2 фракциями.
+    /// Оставлен для совместимости с легаси-сценами.
     /// </summary>
     public void RegisterStory(string[] blocks, int factionAPoints, int factionBPoints)
     {
@@ -90,31 +87,46 @@ public class GameProgressManager : MonoBehaviour
         FactionAScore += factionAPoints;
         FactionBScore += factionBPoints;
 
-        Debug.Log($"[GameProgress] Story registered. Day {CurrentDay}, " +
+        Debug.Log($"[GameProgress][Legacy] Story registered. Day {CurrentDay}, " +
                   $"Stories: {StoriesCompletedToday}/{storiesPerDay}, " +
-                  $"FactionA: {FactionAScore}, FactionB: {FactionBScore}");
+                  $"A:{FactionAScore} B:{FactionBScore}");
+    }
+
+    /// <summary>
+    /// Новый метод для системы ментальной карты.
+    /// broadcastTexts — тексты по ячейкам цепочки (в порядке от cat 0 до cat N).
+    /// </summary>
+    public void RegisterStoryMap(string[] broadcastTexts, int fA, int fB, int fC, int fD)
+    {
+        if (StoriesCompletedToday < storiesPerDay)
+        {
+            _todayStoryBlocks.Add(broadcastTexts);
+            StoriesCompletedToday++;
+        }
+
+        FactionAScore += fA;
+        FactionBScore += fB;
+        FactionCScore += fC;
+        FactionDScore += fD;
+
+        Debug.Log($"[GameProgress] StoryMap registered. Day {CurrentDay}, " +
+                  $"Stories: {StoriesCompletedToday}/{storiesPerDay}, " +
+                  $"A:{FactionAScore} B:{FactionBScore} C:{FactionCScore} D:{FactionDScore}");
     }
 
     /// <summary>
     /// Возвращает все блоки всех сюжетов за сегодня (для Intermedia).
-    /// Каждый сюжет = массив строк (блоков), отображаются реплика за репликой.
     /// </summary>
     public List<string[]> GetTodayStoryBlocks()
     {
         return _todayStoryBlocks;
     }
 
-    /// <summary>
-    /// Завершает смену: переход к Intermedia.
-    /// </summary>
     public void EndShift()
     {
         SceneManager.LoadScene(intermediaScene);
     }
 
-    /// <summary>
-    /// Вызывается из Intermedia после завершения вещания.
-    /// </summary>
     public void OnBroadcastFinished()
     {
         CurrentDay++;
@@ -141,19 +153,17 @@ public class GameProgressManager : MonoBehaviour
         _todayStoryBlocks.Clear();
     }
 
-    /// <summary>
-    /// Полный сброс для новой игры.
-    /// </summary>
     public void ResetAll()
     {
         CurrentDay = 1;
         FactionAScore = 0;
         FactionBScore = 0;
+        FactionCScore = 0;
+        FactionDScore = 0;
         ResetDay();
 
         ResetAllScriptableObjects();
 
-        // Сброс собранных ключей разведки
         if (IntelManager.Instance != null)
             IntelManager.Instance.ResetAll();
     }
@@ -169,10 +179,6 @@ public class GameProgressManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    /// <summary>
-    /// Сбрасывает SO состояния при выходе из Play Mode в редакторе,
-    /// чтобы isCompleted/hasBeenPlayed не застревали.
-    /// </summary>
     private void OnApplicationQuit()
     {
         ResetAllScriptableObjects();

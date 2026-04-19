@@ -214,6 +214,7 @@ public class RadioReceiver : MonoBehaviour
 
         if (dialoguePanel != null) dialoguePanel.Hide();
 
-        TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.RadioListened);
+        // Сообщение прослушано полностью — продвигаем туториал (если активен).
+        TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.RadioMessageCompleted);
     }
 }

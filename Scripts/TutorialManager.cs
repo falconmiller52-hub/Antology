@@ -5,12 +5,17 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Управляет туториалом. День 1: письмо → газета → ПК → радио.
-/// День 2: интервью. Блокирует зоны взаимодействия поэтапно.
+/// Управляет туториалом. День 1 (новый флоу):
+/// Блок 0 (реплики) → письмо (ждём IntelCollected + закрытие меню) →
+/// Блок 2 (реплики) → газета (ждём IntelCollected + закрытие меню) →
+/// Блок 4 (реплики) → радио (ждём RadioMessageCompleted) →
+/// Блок 6 (реплики) → микрофон (ждём InterviewCompleted) →
+/// Блок 8 (реплики) → ПК (ждём StorySubmitted) →
+/// Финальный блок → конец туториала.
 ///
-/// Реплики проигрываются через панель (как радио диалог).
-/// После каждого блока реплик разблокируется определённая зона.
-/// Прогрессия идёт по событиям (получен интел, отправлен сюжет и т.д.).
+/// Реплики проигрываются через панель в стиле радио (voiceBlip + typewriter).
+/// Если игрок закрыл письмо/газету не отметив ключ — панель остаётся скрытой,
+/// туториал продолжит ждать IntelCollected при повторном взаимодействии.
 ///
 /// Настройка:
 /// 1. В каждой Gameplay сцене создайте GameObject "TutorialManager".
@@ -51,6 +56,7 @@ public class TutorialManager : MonoBehaviour
     private bool _isTyping;
     private bool _skipTyping;
     private bool _waitingForEvent;
+    private bool _eventReceived;
     private Coroutine _typeCoroutine;
 
     private void Awake()
@@ -95,6 +101,9 @@ public class TutorialManager : MonoBehaviour
 
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
+            // Не перехватываем клик, если курсор над интерактивным предметом или UI-меню
+            if (InteractableItem.AnyMenuOpen) return;
+
             if (_isTyping)
                 _skipTyping = true;
             else
@@ -118,7 +127,7 @@ public class TutorialManager : MonoBehaviour
         if (currentBlock.waitForEvent == eventType)
         {
             Debug.Log($"[Tutorial] Event matched! Waiting for menus to close...");
-            _waitingForEvent = false;
+            _eventReceived = true;
             StartCoroutine(WaitForMenusClosedThenAdvance());
         }
     }
@@ -128,15 +137,23 @@ public class TutorialManager : MonoBehaviour
         yield return null;
 
         Debug.Log($"[Tutorial] Checking menus: AnyMenuOpen={InteractableItem.AnyMenuOpen}, " +
-                  $"ComputerOpen={ComputerManager.IsOpen}, InterviewOpen={InterviewManager.IsOpen}");
+                  $"ComputerOpen={ComputerManager.IsOpen}, InterviewOpen={InterviewManager.IsOpen}, " +
+                  $"InteractionLocked={InteractableItem.InteractionLocked}");
 
-        while (InteractableItem.AnyMenuOpen || ComputerManager.IsOpen || InterviewManager.IsOpen)
+        // Ждём пока закроются все меню И завершится любое текущее радиовзаимодействие.
+        // RadioReceiver во время диалога держит InteractionLocked=true, так что ждём и его тоже.
+        while (InteractableItem.AnyMenuOpen
+               || ComputerManager.IsOpen
+               || InterviewManager.IsOpen
+               || InteractableItem.InteractionLocked)
         {
             yield return null;
         }
 
         Debug.Log($"[Tutorial] Menus closed. Advancing to block {_currentBlockIndex + 1}");
 
+        _waitingForEvent = false;
+        _eventReceived = false;
         InteractableItem.InteractionLocked = true;
 
         _currentBlockIndex++;
@@ -150,6 +167,7 @@ public class TutorialManager : MonoBehaviour
     {
         TutorialBlock block = blocks[index];
         _currentLineIndex = 0;
+        _eventReceived = false;
 
         // Разблокируем зону для этого блока
         UnlockZone(block.unlockZone);
@@ -181,7 +199,7 @@ public class TutorialManager : MonoBehaviour
             // Блок реплик закончился
             if (block.waitForEvent != TutorialEventType.None)
             {
-                // Ждём событие — разблокируем взаимодействие
+                // Ждём событие — разблокируем взаимодействие, прячем панель
                 _waitingForEvent = true;
                 InteractableItem.InteractionLocked = false;
                 tutorialPanel.SetActive(false);
@@ -306,8 +324,12 @@ public enum TutorialEventType
     None,
     IntelCollected,
     StorySubmitted,
-    RadioListened,
-    InterviewCompleted
+    RadioMessageCompleted,
+    InterviewCompleted,
+
+    // Устаревшее — оставлено для совместимости со старыми сериализованными значениями.
+    // Новые блоки используйте RadioMessageCompleted.
+    RadioListened
 }
 
 public enum TutorialZone

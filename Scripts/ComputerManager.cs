@@ -2,22 +2,23 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Управляет UI компьютера: анимация включения, каталог тем, редактор сюжета, кнопка завершения смены.
+/// Управляет UI компьютера: анимация включения, каталог тем,
+/// ментальная карта сюжета, кнопка завершения смены.
 ///
 /// Настройка:
 /// 1. Canvas (Screen Space - Overlay, Sort Order = 50).
-/// 2. Внутри — TopicListPanel и StoryEditorPanel.
+/// 2. Внутри — TopicListPanel и StoryMapPanel.
 /// 3. Назначьте bootAnimation (на спрайте ПК) и endShiftButton.
 /// </summary>
 public class ComputerManager : MonoBehaviour
 {
     [Header("Panels")]
     [SerializeField] private GameObject topicListPanel;
-    [SerializeField] private GameObject storyEditorPanel;
+    [SerializeField] private GameObject storyMapPanel;
 
     [Header("UI Scripts")]
     [SerializeField] private TopicListUI topicListUI;
-    [SerializeField] private StoryEditorUI storyEditorUI;
+    [SerializeField] private StoryMapUI storyMapUI;
     [SerializeField] private EndShiftButton endShiftButton;
 
     [Header("Topics")]
@@ -28,7 +29,7 @@ public class ComputerManager : MonoBehaviour
 
     public static bool IsOpen { get; private set; }
 
-    private enum Screen { Closed, Booting, TopicList, StoryEditor }
+    private enum Screen { Closed, Booting, TopicList, StoryMap }
     private Screen _currentScreen = Screen.Closed;
 
     private void Start()
@@ -47,9 +48,6 @@ public class ComputerManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Открывает компьютер. Сперва проигрывается анимация загрузки.
-    /// </summary>
     public void OpenComputer()
     {
         if (IsOpen) return;
@@ -70,10 +68,10 @@ public class ComputerManager : MonoBehaviour
     public void OpenStoryEditor(StoryTopic topic)
     {
         topicListPanel.SetActive(false);
-        storyEditorPanel.SetActive(true);
-        _currentScreen = Screen.StoryEditor;
+        storyMapPanel.SetActive(true);
+        _currentScreen = Screen.StoryMap;
 
-        storyEditorUI.Initialize(topic, OnStorySubmitted, OnEditorReturnToCatalog);
+        storyMapUI.Initialize(topic, OnStorySubmitted, OnEditorReturnToCatalog);
     }
 
     private void OnEditorReturnToCatalog()
@@ -90,14 +88,13 @@ public class ComputerManager : MonoBehaviour
 
     private void ShowTopicList()
     {
-        storyEditorPanel.SetActive(false);
+        storyMapPanel.SetActive(false);
         topicListPanel.SetActive(true);
         _currentScreen = Screen.TopicList;
         IsOpen = true;
 
         topicListUI.Populate(availableTopics, this);
 
-        // Обновляем состояние кнопки "Завершить смену"
         if (endShiftButton != null)
             endShiftButton.UpdateState();
     }
@@ -107,11 +104,10 @@ public class ComputerManager : MonoBehaviour
         switch (_currentScreen)
         {
             case Screen.Booting:
-                // Нельзя прервать загрузку
                 break;
 
-            case Screen.StoryEditor:
-                // StoryEditorUI сам обрабатывает Esc
+            case Screen.StoryMap:
+                // StoryMapUI сам обрабатывает Esc
                 break;
 
             case Screen.TopicList:
@@ -124,7 +120,7 @@ public class ComputerManager : MonoBehaviour
     private void CloseAll()
     {
         if (topicListPanel != null) topicListPanel.SetActive(false);
-        if (storyEditorPanel != null) storyEditorPanel.SetActive(false);
+        if (storyMapPanel != null) storyMapPanel.SetActive(false);
 
         _currentScreen = Screen.Closed;
         IsOpen = false;

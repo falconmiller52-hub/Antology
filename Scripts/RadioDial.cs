@@ -2,9 +2,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Вращаемый триггер (ручка настройки частоты).
-/// Игрок зажимает ЛКМ на ручке и двигает мышь вверх/вниз для вращения.
-/// Спрайт вращается вокруг оси Z, имитируя поворот в 2D.
+/// Вращаемая ручка настройки частоты.
+/// Игрок зажимает ЛКМ на ручке и двигает мышь вправо/влево — ручка вращается
+/// синхронно с движением мыши вокруг оси Z.
+///
+/// Реализация через абсолютную позицию мыши между кадрами (а не Mouse.delta),
+/// благодаря чему движение плавное и не зависит от fps.
 ///
 /// Настройка:
 /// 1. Дочерний GameObject от Radio со SpriteRenderer (спрайт ручки).
@@ -18,8 +21,9 @@ public class RadioDial : MonoBehaviour
     [SerializeField] private float minAngle = -150f;
     [Tooltip("Максимальный угол поворота (градусы)")]
     [SerializeField] private float maxAngle = 150f;
-    [Tooltip("Чувствительность вращения к движению мыши (0.1-1.0 рекомендуется)")]
-    [SerializeField] private float sensitivity = 0.3f;
+    [Tooltip("Градусов поворота на 1 юнит горизонтального движения мыши в мире. " +
+             "Увеличьте для более быстрой реакции, уменьшите для точности.")]
+    [SerializeField] private float degreesPerWorldUnit = 180f;
 
     [Header("Visual")]
     [SerializeField] private SpriteRenderer dialRenderer;
@@ -36,6 +40,12 @@ public class RadioDial : MonoBehaviour
     private bool _isDragging;
     private bool _isHovered;
     private float _currentAngle;
+
+    // Отслеживание позиции мыши между кадрами в мировых координатах.
+    // Использование абсолютной позиции (а не Mouse.delta) даёт плавное
+    // движение без дёрганий, синхронное с движением курсора.
+    private float _lastMouseWorldX;
+
     private Camera _mainCamera;
     private CustomCursor _customCursor;
 
@@ -79,6 +89,7 @@ public class RadioDial : MonoBehaviour
         if (hoveringThis && Mouse.current.leftButton.wasPressedThisFrame)
         {
             _isDragging = true;
+            _lastMouseWorldX = mouseWorldPos.x;
             _customCursor?.SetGrab();
             AudioManager.Instance?.PlayRadioTuning();
         }
@@ -88,14 +99,17 @@ public class RadioDial : MonoBehaviour
         {
             if (Mouse.current.leftButton.isPressed)
             {
-                // Дельта мыши — вертикальное движение вращает ручку
-                // Без Time.deltaTime — прямая связь с движением мыши
-                Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-                float rotationDelta = mouseDelta.y * sensitivity;
+                // Разница между текущей и прошлой позицией мыши в мировых единицах
+                // по горизонтали. Это даёт плавный, синхронный с мышью поворот:
+                // мышь сдвинулась — ручка повернулась на столько же (× множитель).
+                float deltaX = mouseWorldPos.x - _lastMouseWorldX;
+                float rotationDelta = deltaX * degreesPerWorldUnit;
 
                 _currentAngle = Mathf.Clamp(_currentAngle + rotationDelta, minAngle, maxAngle);
                 ApplyRotation();
                 UpdateNormalizedValue();
+
+                _lastMouseWorldX = mouseWorldPos.x;
             }
             else
             {

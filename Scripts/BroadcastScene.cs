@@ -7,14 +7,11 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Контроллер сцены Intermedia (вещание).
-/// Показывает картинку радиостанции и текст вещания реплика за репликой.
-/// Порядок: приветствие → сюжеты игрока → прощание → затемнение → следующий день.
+/// Порядок: приветствие → сюжеты игрока (по порядку, каждая ячейка — отдельная реплика)
+/// → прощание → затемнение → следующий день.
 ///
-/// Настройка:
-/// 1. Сцена Intermedia: Canvas с Image (радиостанция) и TextMeshProUGUI (текст).
-/// 2. Повесьте этот скрипт на Canvas или отдельный GameObject.
-/// 3. Назначьте тексты приветствия и прощания.
-/// 4. Добавьте SceneFadeIn (растемнение) и SceneFadeOut (затемнение) в сцену.
+/// Клик ЛКМ — промотка текущей реплики. Если реплика уже написана, клик переходит
+/// к следующей.
 /// </summary>
 public class BroadcastScene : MonoBehaviour
 {
@@ -40,7 +37,6 @@ public class BroadcastScene : MonoBehaviour
 
     private void Start()
     {
-        // Сирена в начале вещания
         AudioManager.Instance?.PlaySiren();
 
         BuildLinesList();
@@ -55,13 +51,9 @@ public class BroadcastScene : MonoBehaviour
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (_isTyping)
-            {
                 _skipTyping = true;
-            }
             else
-            {
                 AdvanceLine();
-            }
         }
     }
 
@@ -74,7 +66,7 @@ public class BroadcastScene : MonoBehaviour
             foreach (string line in greetingLines)
                 _allLines.Add(line);
 
-        // Сюжеты игрока — блок за блоком
+        // Сюжеты игрока — каждая ячейка цепочки = отдельная реплика
         if (GameProgressManager.Instance != null)
         {
             List<string[]> storyBlocks = GameProgressManager.Instance.GetTodayStoryBlocks();
@@ -151,32 +143,20 @@ public class BroadcastScene : MonoBehaviour
         SceneFadeOut fader = FindFirstObjectByType<SceneFadeOut>();
         if (fader != null)
         {
-            Debug.Log("[Broadcast] FadeOut found, fading...");
             fader.FadeAndExecute(() =>
             {
                 if (GameProgressManager.Instance != null)
-                {
                     GameProgressManager.Instance.OnBroadcastFinished();
-                }
                 else
-                {
-                    Debug.LogWarning("[Broadcast] GameProgressManager is NULL, quitting directly.");
                     QuitGame();
-                }
             });
         }
         else
         {
-            Debug.Log("[Broadcast] No FadeOut found, finishing directly.");
             if (GameProgressManager.Instance != null)
-            {
                 GameProgressManager.Instance.OnBroadcastFinished();
-            }
             else
-            {
-                Debug.LogWarning("[Broadcast] GameProgressManager is NULL, quitting directly.");
                 QuitGame();
-            }
         }
     }
 

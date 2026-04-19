@@ -2,8 +2,13 @@ using UnityEngine;
 
 /// <summary>
 /// Тема для радиосюжета. Создаётся через Assets → Create → Story → Topic.
-/// Содержит название темы, описание и набор блоков-пропусков,
-/// которые игрок заполняет фразами.
+///
+/// Новый формат (ментальная карта):
+/// - nodePlacements: все ноды этой темы с их позициями на карте.
+/// - requiredChainLength: точная длина цепочки (обычно 4: cat 0→1→2→3).
+///
+/// Старый формат (blocks / PhraseOption) оставлен как [System.Obsolete]
+/// для переходного периода — пока не удалены ссылки в legacy-сценах.
 /// </summary>
 [CreateAssetMenu(fileName = "NewStoryTopic", menuName = "Story/Topic")]
 public class StoryTopic : ScriptableObject
@@ -14,19 +19,42 @@ public class StoryTopic : ScriptableObject
     [TextArea(2, 4)]
     public string topicDescription = "Описание темы для сюжета";
 
-    [Header("Story Blocks")]
-    [Tooltip("Блоки-пропуски, которые игрок заполняет по порядку")]
+    // ===== НОВАЯ СИСТЕМА (ментальная карта) =====
+
+    [Header("Mind Map Nodes")]
+    [Tooltip("Все ноды, доступные в этой теме, с предустановленными позициями на карте.")]
+    public StoryNodePlacement[] nodePlacements;
+
+    [Header("Chain Requirements")]
+    [Tooltip("Точная длина цепочки для валидного сюжета (обычно 4 = cat 0→1→2→3).")]
+    public int requiredChainLength = 4;
+
+    // ===== СТАРАЯ СИСТЕМА (legacy, для переходного периода) =====
+
+    [Header("Legacy (old blocks system)")]
+    [Tooltip("Устарело. Используется nodePlacements. Оставлено для совместимости.")]
     public StoryBlock[] blocks;
+
+    // ===== Состояние =====
 
     [Header("State")]
     [HideInInspector]
     public bool isCompleted;
 
-    /// <summary>
-    /// Сбрасывает состояние (для начала нового дня).
-    /// </summary>
     public void ResetState()
     {
         isCompleted = false;
     }
+}
+
+/// <summary>
+/// Размещение одной ноды на карте: ссылка на ScriptableObject + позиция на доске.
+/// </summary>
+[System.Serializable]
+public class StoryNodePlacement
+{
+    public StoryNode node;
+
+    [Tooltip("Позиция на карте (UI-координаты в RectTransform карты)")]
+    public Vector2 position;
 }
