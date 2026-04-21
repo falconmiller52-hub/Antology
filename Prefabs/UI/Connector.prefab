@@ -33,10 +33,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1704.95, y: 810}
-  m_SizeDelta: {x: -529.9, y: -526.1}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 1704.95, y: 540}
+  m_SizeDelta: {x: 430.09998, y: 13.900024}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &7207796222023762237
 CanvasRenderer:
@@ -89,7 +89,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoryConnectionUI
   lineImage: {fileID: 7953043394839248561}
-  lineThickness: 4
+  lineThickness: 1
   validColor: {r: 0.3, g: 0.7, b: 1, a: 1}
   invalidColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   completeColor: {r: 0.3, g: 1, b: 0.4, a: 1}
+  draggingColor: {r: 0.9, g: 0.9, b: 0.9, a: 0.8}

@@ -4934,10 +4934,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameProgressManager
   storiesPerDay: 1
-  totalDays: 2
+  totalDays: 5
   gameplayScenes:
   - Gameplay1
   - Gameplay2
+  - Gameplay3
   intermediaScene: Intermedia
   endingAScene: EndingA
   endingBScene: EndingB

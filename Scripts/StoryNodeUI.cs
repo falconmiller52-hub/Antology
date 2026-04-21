@@ -5,19 +5,10 @@ using TMPro;
 
 /// <summary>
 /// UI-представление одной ноды на ментальной карте.
-/// Поддерживает:
-/// - Перетаскивание по карте (драг основной части).
-/// - Два "сокета": левый (вход) и правый (выход) для создания связей.
-/// - Визуальное состояние: заблокирована (нет ключа) / доступна / выбрана.
-///
-/// Настройка префаба:
-/// 1. Root: RectTransform + CanvasGroup.
-/// 2. Дочерний Image "Body" — спрайт ячейки.
-/// 3. Дочерний TextMeshProUGUI "Label".
-/// 4. Два дочерних Image "InputSocket" (слева) и "OutputSocket" (справа)
-///    с компонентом StorySocketUI.
+/// Все позиции (драг, позиции сокетов) считаются относительно mapArea —
+/// единого RectTransform, в котором лежат и ноды, и нити.
 /// </summary>
-public class StoryNodeUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class StoryNodeUI : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("Visual")]
     [SerializeField] private Image bodyImage;
@@ -26,8 +17,8 @@ public class StoryNodeUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     [SerializeField] private Sprite unlockedSprite;
 
     [Header("Sockets")]
-    [SerializeField] private StorySocketUI inputSocket;   // слева (cat N принимает от cat N-1)
-    [SerializeField] private StorySocketUI outputSocket;  // справа (cat N соединяется с cat N+1)
+    [SerializeField] private StorySocketUI inputSocket;
+    [SerializeField] private StorySocketUI outputSocket;
 
     [Header("Locked Visual")]
     [SerializeField] private Color lockedTint = new Color(0.5f, 0.5f, 0.5f, 0.7f);
@@ -39,18 +30,27 @@ public class StoryNodeUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     public StorySocketUI OutputSocket => outputSocket;
 
     private RectTransform _rect;
-    private RectTransform _canvasRect;
+    // Родительский контейнер карты (mapArea). В нём ноды и нити живут вместе,
+    // благодаря чему все локальные координаты согласованы.
+    private RectTransform _mapArea;
     private StoryMapUI _map;
+
+    private Vector2 _dragOffset;
 
     public System.Action<StoryNodeUI> OnPositionChanged;
 
-    public void Initialize(StoryNode node, bool unlocked, RectTransform canvasRect, StoryMapUI map)
+    public void Initialize(StoryNode node, bool unlocked, RectTransform mapArea, StoryMapUI map)
     {
         Node = node;
         IsUnlocked = unlocked;
-        _canvasRect = canvasRect;
+        _mapArea = mapArea;
         _map = map;
         _rect = GetComponent<RectTransform>();
+
+        if (_rect.localScale == Vector3.zero)
+            _rect.localScale = Vector3.one;
+        if (_rect.sizeDelta.x <= 0f || _rect.sizeDelta.y <= 0f)
+            _rect.sizeDelta = new Vector2(200f, 80f);
 
         if (labelText != null)
             labelText.text = unlocked ? node.label : "???";
@@ -61,37 +61,40 @@ public class StoryNodeUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             bodyImage.color = unlocked ? unlockedTint : lockedTint;
         }
 
-        // Категория 0 (корневая) не имеет входного сокета — её никто не "соединяет с ней слева".
         if (inputSocket != null)
             inputSocket.gameObject.SetActive(node.category > 0);
-
-        // Категория 3 (последняя) не имеет выходного сокета — цепочка здесь заканчивается.
         if (outputSocket != null)
             outputSocket.gameObject.SetActive(node.category < 3);
 
-        if (inputSocket != null)
+        if (inputSocket != null && inputSocket.gameObject.activeSelf)
             inputSocket.Initialize(this, SocketType.Input, map);
-        if (outputSocket != null)
+        if (outputSocket != null && outputSocket.gameObject.activeSelf)
             outputSocket.Initialize(this, SocketType.Output, map);
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    public void OnPointerDown(PointerEventData eventData)
     {
         if (!IsUnlocked) return;
 
-        // Если клик начался на сокете — не драгаем саму ячейку.
-        // (IPointerDownHandler на сокете перехватывает ранее.)
+        Vector2 pointerLocal;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _mapArea, eventData.position, eventData.pressEventCamera, out pointerLocal))
+        {
+            _dragOffset = (Vector2)_rect.localPosition - pointerLocal;
+        }
     }
+
+    public void OnBeginDrag(PointerEventData eventData) { }
 
     public void OnDrag(PointerEventData eventData)
     {
         if (!IsUnlocked) return;
 
-        Vector2 localPoint;
+        Vector2 pointerLocal;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _canvasRect, eventData.position, eventData.pressEventCamera, out localPoint))
+                _mapArea, eventData.position, eventData.pressEventCamera, out pointerLocal))
         {
-            _rect.localPosition = localPoint;
+            _rect.localPosition = pointerLocal + _dragOffset;
             OnPositionChanged?.Invoke(this);
         }
     }
@@ -103,25 +106,28 @@ public class StoryNodeUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     }
 
     /// <summary>
-    /// Возвращает мировую (canvas local) позицию указанного сокета.
-    /// Используется для рисования нитей.
+    /// Возвращает позицию сокета в локальных координатах mapArea.
     /// </summary>
     public Vector2 GetSocketLocalPosition(SocketType type)
     {
         RectTransform target = (type == SocketType.Input)
-            ? inputSocket.GetComponent<RectTransform>()
-            : outputSocket.GetComponent<RectTransform>();
+            ? (inputSocket != null ? inputSocket.GetComponent<RectTransform>() : null)
+            : (outputSocket != null ? outputSocket.GetComponent<RectTransform>() : null);
 
         if (target == null) return _rect.localPosition;
 
-        // Получаем мировую позицию сокета и конвертируем в local координаты canvas.
+        // Получаем мировую позицию сокета и конвертируем в координаты mapArea.
+        // Делаем через WorldToScreen → ScreenToLocalPointInRectangle(mapArea), чтобы
+        // учесть все вложенные трансформы корректно.
         Vector3 world = target.position;
+        Canvas canvas = _mapArea.GetComponentInParent<Canvas>();
+        Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                     ? canvas.worldCamera : null;
+
+        Vector2 screen = RectTransformUtility.WorldToScreenPoint(cam, world);
         Vector2 local;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _canvasRect,
-            RectTransformUtility.WorldToScreenPoint(null, world),
-            null,
-            out local);
+            _mapArea, screen, cam, out local);
         return local;
     }
 }

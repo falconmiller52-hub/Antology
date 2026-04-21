@@ -1959,7 +1959,8 @@ MonoBehaviour:
   radioImage: {fileID: 1387136494}
   greetingLines:
   - "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0435\u043D\u0438\u0435 \u0441\u043B\u0435\u0434\u0443\u0435\u0442..."
-  farewellLines: []
+  farewellLines:
+  - "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0430\u0435\u043C"
   typeSpeed: 0.04
 --- !u!1 &1663882655
 GameObject:

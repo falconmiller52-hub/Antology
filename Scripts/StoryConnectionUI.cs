@@ -4,32 +4,36 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Визуальная нить между двумя ячейками на карте.
-/// Прямая линия через Image, растянутый и повёрнутый.
-/// ПКМ по нити — удалить связь.
-/// Цвет:
-///  - Голубой: связь разрешена и пока не завершающая.
-///  - Красный: связь недопустимая (категории не совпадают, не 0→1→2→3).
-///    Для прототипа: недопустимые связи не создаются. Красный зарезервирован.
-///  - Зелёный: цепочка полностью собрана (0→1→2→3) — окрашиваются все нити цепочки.
 ///
-/// Настройка префаба:
-/// 1. UI Image, Anchor = middle-left, Pivot = (0, 0.5).
-/// 2. Raycast Target = ON для перехвата ПКМ.
-/// 3. Повесьте этот скрипт.
+/// ВАЖНО: независимо от настроек префаба, в Awake принудительно выставляются:
+///  - Anchor Min = Max = (0, 0.5)
+///  - Pivot = (0, 0.5)
+///  - Scale = (1, 1, 1)
+/// Это гарантирует, что sizeDelta.x работает как реальная длина линии,
+/// а sizeDelta.y — как реальная толщина (а не смещение от растянутого anchor).
+///
+/// Толщина настраивается в поле lineThickness.
+/// НЕ используйте масштабирование префаба для изменения толщины.
 /// </summary>
 public class StoryConnectionUI : MonoBehaviour, IPointerClickHandler
 {
     [Header("Visual")]
     [SerializeField] private Image lineImage;
+    [Tooltip("Толщина линии в пикселях Canvas'а. НЕ используйте scale префаба для изменения толщины.")]
     [SerializeField] private float lineThickness = 4f;
 
     [Header("Colors")]
     [SerializeField] private Color validColor = new Color(0.3f, 0.7f, 1f, 1f);
     [SerializeField] private Color invalidColor = new Color(1f, 0.3f, 0.3f, 1f);
     [SerializeField] private Color completeColor = new Color(0.3f, 1f, 0.4f, 1f);
+    [SerializeField] private Color draggingColor = new Color(0.9f, 0.9f, 0.9f, 0.8f);
 
     public StoryNodeUI From { get; private set; }
     public StoryNodeUI To { get; private set; }
+    public SocketType FromSocketType { get; private set; }
+
+    private bool _isDragging;
+    private Vector2 _draggingEndpoint;
 
     private RectTransform _rect;
     private StoryMapUI _map;
@@ -39,27 +43,63 @@ public class StoryConnectionUI : MonoBehaviour, IPointerClickHandler
         _rect = GetComponent<RectTransform>();
         if (lineImage == null)
             lineImage = GetComponent<Image>();
+
+        // Принудительный сброс — защита от неправильно собранного префаба.
+        _rect.anchorMin = new Vector2(0f, 0.5f);
+        _rect.anchorMax = new Vector2(0f, 0.5f);
+        _rect.pivot = new Vector2(0f, 0.5f);
+        _rect.localScale = Vector3.one;
+        _rect.sizeDelta = new Vector2(0f, lineThickness);
     }
 
-    public void Initialize(StoryNodeUI from, StoryNodeUI to, StoryMapUI map)
+    public void InitializeComplete(StoryNodeUI from, StoryNodeUI to, StoryMapUI map)
     {
         From = from;
         To = to;
+        FromSocketType = SocketType.Output;
+        _isDragging = false;
         _map = map;
+        if (lineImage != null) lineImage.raycastTarget = true;
         UpdateShape();
         SetState(ConnectionState.Valid);
     }
 
-    /// <summary>
-    /// Пересчитать позицию/длину/угол линии между двумя сокетами.
-    /// Вызывается при перемещении любой из ячеек.
-    /// </summary>
+    public void InitializeDragging(StoryNodeUI from, SocketType fromSocket, StoryMapUI map)
+    {
+        From = from;
+        To = null;
+        FromSocketType = fromSocket;
+        _isDragging = true;
+        _draggingEndpoint = from.GetSocketLocalPosition(fromSocket);
+        _map = map;
+        if (lineImage != null) lineImage.raycastTarget = false;
+        SetState(ConnectionState.Dragging);
+        UpdateShape();
+    }
+
+    public void UpdateDraggingEndpoint(Vector2 localPoint)
+    {
+        _draggingEndpoint = localPoint;
+        UpdateShape();
+    }
+
     public void UpdateShape()
     {
-        if (From == null || To == null) return;
+        if (_rect == null) return;
 
-        Vector2 a = From.GetSocketLocalPosition(SocketType.Output);
-        Vector2 b = To.GetSocketLocalPosition(SocketType.Input);
+        Vector2 a, b;
+        if (_isDragging)
+        {
+            if (From == null) return;
+            a = From.GetSocketLocalPosition(FromSocketType);
+            b = _draggingEndpoint;
+        }
+        else
+        {
+            if (From == null || To == null) return;
+            a = From.GetSocketLocalPosition(SocketType.Output);
+            b = To.GetSocketLocalPosition(SocketType.Input);
+        }
 
         Vector2 diff = b - a;
         float length = diff.magnitude;
@@ -76,19 +116,19 @@ public class StoryConnectionUI : MonoBehaviour, IPointerClickHandler
 
         switch (state)
         {
-            case ConnectionState.Valid:   lineImage.color = validColor;    break;
-            case ConnectionState.Invalid: lineImage.color = invalidColor;  break;
-            case ConnectionState.Complete:lineImage.color = completeColor; break;
+            case ConnectionState.Valid:    lineImage.color = validColor;    break;
+            case ConnectionState.Invalid:  lineImage.color = invalidColor;  break;
+            case ConnectionState.Complete: lineImage.color = completeColor; break;
+            case ConnectionState.Dragging: lineImage.color = draggingColor; break;
         }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (_isDragging) return;
         if (eventData.button == PointerEventData.InputButton.Right)
-        {
             _map?.RemoveConnection(this);
-        }
     }
 
-    public enum ConnectionState { Valid, Invalid, Complete }
+    public enum ConnectionState { Valid, Invalid, Complete, Dragging }
 }

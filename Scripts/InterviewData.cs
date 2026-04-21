@@ -5,10 +5,14 @@ using UnityEngine;
 /// Создаётся через Assets → Create → Interview → Data.
 ///
 /// Диалоговое дерево хранится как массив узлов.
-/// Каждый узел = реплика НПС + варианты ответов игрока.
-/// Ответы ссылаются на следующие узлы по индексу.
-/// Индекс -1 = конец интервью ([ЗАКОНЧИТЬ]).
-/// Циклический узел: несколько ответов ведут обратно к тому же узлу (loopBackNodeIndex).
+/// Каждый узел имеет тип:
+///  - Linear: NPC говорит, клик по панели → переход на nextNodeIndex.
+///  - Choice: NPC говорит, затем показываются варианты ответов игрока.
+///
+/// Циклы делаются естественно: любой узел может указать nextNodeIndex
+/// обратно на любой другой узел. Специальных режимов нет.
+///
+/// Индекс -1 в nextNodeIndex = конец интервью.
 /// </summary>
 [CreateAssetMenu(fileName = "NewInterview", menuName = "Interview/Data")]
 public class InterviewData : ScriptableObject
@@ -40,6 +44,17 @@ public class InterviewData : ScriptableObject
 }
 
 /// <summary>
+/// Тип узла диалога.
+/// Linear — NPC говорит, после окончания клик ведёт на nextNodeIndex.
+/// Choice — NPC говорит, затем показываются варианты ответов игрока.
+/// </summary>
+public enum DialogueNodeType
+{
+    Linear,
+    Choice
+}
+
+/// <summary>
 /// Один узел диалогового дерева.
 /// </summary>
 [System.Serializable]
@@ -49,11 +64,14 @@ public class DialogueNode
     [TextArea(2, 5)]
     public string npcLine;
 
-    [Tooltip("Варианты ответов игрока")]
-    public PlayerResponse[] responses;
+    [Tooltip("Тип узла: Linear (автопереход по клику) или Choice (варианты ответа).")]
+    public DialogueNodeType type = DialogueNodeType.Choice;
 
-    [Tooltip("Если true — после выбора любого ответа из цикла, НПС повторяет эту же реплику")]
-    public bool isCyclic;
+    [Tooltip("Куда перейти после клика. Используется только для Linear. -1 = конец интервью.")]
+    public int nextNodeIndex = -1;
+
+    [Tooltip("Варианты ответов игрока. Используется только для Choice.")]
+    public PlayerResponse[] responses;
 
     [Tooltip("Ключ разведки, автоматически собираемый при показе этой реплики НПС")]
     public IntelKey intelKey;
@@ -69,9 +87,9 @@ public class PlayerResponse
     [TextArea(1, 3)]
     public string text;
 
-    [Tooltip("Индекс следующего узла. -1 = конец интервью. Для циклических — индекс промежуточного узла (реакция НПС перед возвратом)")]
+    [Tooltip("Индекс узла, на который ведёт этот ответ. -1 = конец интервью.")]
     public int nextNodeIndex = -1;
 
-    [Tooltip("Если true — это [ЗАКОНЧИТЬ], завершает интервью")]
+    [Tooltip("Если true — этот ответ отображается как [ЗАКОНЧИТЬ] и завершает интервью.")]
     public bool endsInterview;
 }

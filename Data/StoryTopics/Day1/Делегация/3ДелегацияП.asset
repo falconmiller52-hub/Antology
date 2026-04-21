@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c452554abdab36844a10fd3d0369efd2, type: 3}
   m_Name: "3\u0414\u0435\u043B\u0435\u0433\u0430\u0446\u0438\u044F\u041F"
   m_EditorClassIdentifier: Assembly-CSharp::StoryNode
-  label: "\u0414\u0435\u043B\u0435\u0433\u0430\u0446\u0438\u044F"
+  label: "3\u043F"
   description: 
-  category: 0
+  category: 3
   requiredIntelKey: {fileID: 11400000, guid: f81bcce6480dfba4e8f1b3bf0103faef, type: 2}
   factionAPoints: 5
   factionBPoints: 0

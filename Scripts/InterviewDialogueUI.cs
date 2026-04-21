@@ -1,14 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
 
 /// <summary>
 /// Экран диалога интервью.
-/// Панель ответов игрока ВСЕГДА видна (пустая пока НПС говорит).
-/// Hover на репликах: смена цвета + звук.
+/// Два типа узлов:
+///  - Linear: NPC говорит → клик по панели переходит на nextNodeIndex.
+///  - Choice: NPC говорит → показываются варианты ответов.
+///
 /// Intel keys автоматически собираются при показе реплик НПС.
 /// </summary>
 public class InterviewDialogueUI : MonoBehaviour
@@ -30,6 +31,10 @@ public class InterviewDialogueUI : MonoBehaviour
     [SerializeField] private int charsPerBlip = 2;
     [SerializeField] private AudioSource blipSource;
 
+    [Header("Linear Node Hint")]
+    [Tooltip("Можно опционально показывать подсказку '▼ клик для продолжения' на Linear-узлах")]
+    [SerializeField] private GameObject linearContinueHint;
+
     [Header("Response Colors")]
     [SerializeField] private Color responseNormalColor = new Color(0.7f, 0.7f, 0.7f, 1f);
     [SerializeField] private Color responseHoverColor = new Color(1f, 1f, 0.7f, 1f);
@@ -47,6 +52,7 @@ public class InterviewDialogueUI : MonoBehaviour
     private int _currentNodeIndex;
     private bool _isTyping;
     private bool _skipTyping;
+    private bool _waitingForLinearContinue;
     private Coroutine _typeCoroutine;
 
     private void Awake()
@@ -74,6 +80,7 @@ public class InterviewDialogueUI : MonoBehaviour
 
         playerPanel.SetActive(true);
         ClearResponses();
+        HideLinearHint();
         ShowNode(_currentNodeIndex);
     }
 
@@ -89,14 +96,16 @@ public class InterviewDialogueUI : MonoBehaviour
         DialogueNode node = _data.nodes[nodeIndex];
 
         ClearResponses();
+        HideLinearHint();
 
-        // Highlight intel lines
+        // Подсветка реплик с intel
         bool hasIntel = node.intelKey != null;
         npcLineText.color = hasIntel ? intelNpcLineColor : normalNpcLineColor;
 
         if (hasIntel)
             IntelManager.Instance?.CollectKey(node.intelKey);
 
+        _waitingForLinearContinue = false;
         StartTyping(node.npcLine);
     }
 
@@ -127,14 +136,45 @@ public class InterviewDialogueUI : MonoBehaviour
         OnTypingComplete();
     }
 
-    private void OnNpcPanelClicked()
-    {
-        if (_isTyping) _skipTyping = true;
-    }
-
     private void OnTypingComplete()
     {
-        ShowPlayerResponses(_data.nodes[_currentNodeIndex]);
+        DialogueNode node = _data.nodes[_currentNodeIndex];
+
+        if (node.type == DialogueNodeType.Linear)
+        {
+            // Ждём клика по NPC-панели, затем идём на nextNodeIndex
+            _waitingForLinearContinue = true;
+            ShowLinearHint();
+        }
+        else // Choice
+        {
+            ShowPlayerResponses(node);
+        }
+    }
+
+    private void OnNpcPanelClicked()
+    {
+        // 1) Пропуск печати.
+        if (_isTyping)
+        {
+            _skipTyping = true;
+            return;
+        }
+
+        // 2) Продолжение Linear-узла.
+        if (_waitingForLinearContinue)
+        {
+            _waitingForLinearContinue = false;
+            HideLinearHint();
+
+            AudioManager.Instance?.PlayButtonClick();
+
+            DialogueNode node = _data.nodes[_currentNodeIndex];
+            if (node.nextNodeIndex < 0)
+                EndInterview();
+            else
+                ShowNode(node.nextNodeIndex);
+        }
     }
 
     private void ShowPlayerResponses(DialogueNode node)
@@ -143,7 +183,9 @@ public class InterviewDialogueUI : MonoBehaviour
 
         if (node.responses == null || node.responses.Length == 0)
         {
-            ShowNode(_currentNodeIndex + 1);
+            Debug.LogWarning($"[Interview] Choice-узел {_currentNodeIndex} не имеет ответов. " +
+                             $"Пометьте его как Linear или добавьте responses. Завершаю интервью.");
+            EndInterview();
             return;
         }
 
@@ -162,10 +204,8 @@ public class InterviewDialogueUI : MonoBehaviour
             Button btn = btnObj.GetComponent<Button>();
             if (btn != null)
             {
-                bool isCyclic = node.isCyclic;
-                int currentNode = _currentNodeIndex;
                 PlayerResponse cap = response;
-                btn.onClick.AddListener(() => OnResponseSelected(cap, isCyclic, currentNode));
+                btn.onClick.AddListener(() => OnResponseSelected(cap));
             }
 
             if (!response.endsInterview)
@@ -194,70 +234,18 @@ public class InterviewDialogueUI : MonoBehaviour
         trigger.triggers.Add(exit);
     }
 
-    private void OnResponseSelected(PlayerResponse response, bool isCyclicNode, int sourceNodeIndex)
+    private void OnResponseSelected(PlayerResponse response)
     {
         AudioManager.Instance?.PlayButtonClick();
         ClearResponses();
 
-        if (response.endsInterview) { EndInterview(); return; }
-
-        if (isCyclicNode)
+        if (response.endsInterview || response.nextNodeIndex < 0)
         {
-            if (response.nextNodeIndex >= 0 && response.nextNodeIndex < _data.nodes.Length)
-            {
-                DialogueNode reaction = _data.nodes[response.nextNodeIndex];
-                if (reaction.intelKey != null)
-                    IntelManager.Instance?.CollectKey(reaction.intelKey);
-                StartTypingThenReturn(reaction.npcLine, sourceNodeIndex);
-            }
-            else
-            {
-                ShowNode(sourceNodeIndex);
-            }
+            EndInterview();
+            return;
         }
-        else
-        {
-            ShowNode(response.nextNodeIndex >= 0 ? response.nextNodeIndex : _currentNodeIndex + 1);
-        }
-    }
 
-    private void StartTypingThenReturn(string line, int returnNodeIndex)
-    {
-        _skipTyping = false;
-        _isTyping = true;
-        if (_typeCoroutine != null) StopCoroutine(_typeCoroutine);
-        _typeCoroutine = StartCoroutine(TypeTextThenReturn(line, returnNodeIndex));
-    }
-
-    private IEnumerator TypeTextThenReturn(string line, int returnNodeIndex)
-    {
-        npcLineText.text = "";
-        _isTyping = true;
-        _skipTyping = false;
-        for (int i = 0; i < line.Length; i++)
-        {
-            if (_skipTyping) { npcLineText.text = line; break; }
-            npcLineText.text = line.Substring(0, i + 1);
-            if (_data.voiceBlip != null && blipSource != null
-                && !char.IsWhiteSpace(line[i]) && i % charsPerBlip == 0)
-            {
-                blipSource.pitch = _data.voicePitch + Random.Range(-0.05f, 0.05f);
-                blipSource.PlayOneShot(_data.voiceBlip);
-            }
-            yield return new WaitForSeconds(typeSpeed);
-        }
-        _isTyping = false;
-        yield return WaitForNpcPanelClick();
-        ShowNode(returnNodeIndex);
-    }
-
-    private IEnumerator WaitForNpcPanelClick()
-    {
-        bool clicked = false;
-        System.Action handler = () => { clicked = true; };
-        npcPanelClickArea.onClick.AddListener(new UnityEngine.Events.UnityAction(handler));
-        while (!clicked) yield return null;
-        npcPanelClickArea.onClick.RemoveListener(new UnityEngine.Events.UnityAction(handler));
+        ShowNode(response.nextNodeIndex);
     }
 
     private void ClearResponses()
@@ -266,10 +254,24 @@ public class InterviewDialogueUI : MonoBehaviour
             Destroy(child.gameObject);
     }
 
+    private void ShowLinearHint()
+    {
+        if (linearContinueHint != null)
+            linearContinueHint.SetActive(true);
+    }
+
+    private void HideLinearHint()
+    {
+        if (linearContinueHint != null)
+            linearContinueHint.SetActive(false);
+    }
+
     private void EndInterview()
     {
         if (_typeCoroutine != null) StopCoroutine(_typeCoroutine);
         ClearResponses();
+        HideLinearHint();
+        _waitingForLinearContinue = false;
         npcLineText.text = "";
         _onFinished?.Invoke(_data);
     }

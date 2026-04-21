@@ -7,30 +7,19 @@ using System.Collections.Generic;
 /// <summary>
 /// Главный контроллер ментальной карты сюжета.
 ///
-/// Отвечает за:
-/// - Построение ячеек по nodePlacements темы.
-/// - Проверку доступности ячеек по IntelKey.
-/// - Логику создания/удаления связей.
-/// - Валидацию цепочки и активацию кнопки "Отправить".
-/// - Передачу результата в GameProgressManager.
+/// ВАЖНО: ноды и нити кладутся в один родитель — mapArea — чтобы все
+/// локальные координаты были согласованы. Z-порядок управляется через
+/// SetAsFirstSibling для нитей (они рисуются под нодами).
 ///
-/// Настройка:
-/// 1. Canvas с панелью "StoryMapPanel".
-/// 2. Внутри: RectTransform "MapArea" (большое рабочее поле) —
-///    это canvasRect, относительно которого позиционируются ноды и линии.
-/// 3. Контейнеры: nodesContainer (дочерний от MapArea), connectionsContainer (дочерний от MapArea).
-/// 4. Префабы: nodePrefab (StoryNodeUI), connectionPrefab (StoryConnectionUI).
-/// 5. Кнопка submitButton (внизу по центру), поле topicTitleText.
+/// Создание связей: клик ЛКМ по сокету → тянется линия за курсором →
+/// клик ЛКМ по второму сокету (совместимому) → фиксация / красная вспышка.
+/// ПКМ или Esc — отмена тянущейся нити.
 /// </summary>
 public class StoryMapUI : MonoBehaviour
 {
     [Header("Map Area")]
-    [Tooltip("RectTransform рабочего поля карты. Внутри него размещаются ноды и линии.")]
+    [Tooltip("Единый контейнер для нод и нитей. Все позиции считаются относительно него.")]
     [SerializeField] private RectTransform mapArea;
-
-    [Header("Containers")]
-    [SerializeField] private RectTransform nodesContainer;
-    [SerializeField] private RectTransform connectionsContainer;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject nodePrefab;
@@ -47,14 +36,13 @@ public class StoryMapUI : MonoBehaviour
     private List<StoryNodeUI> _nodes = new List<StoryNodeUI>();
     private List<StoryConnectionUI> _connections = new List<StoryConnectionUI>();
 
-    // Состояние создания связи: "вооружённый" сокет — ждёт второго клика.
-    private StorySocketUI _armedSocket;
+    private StoryConnectionUI _draggingConnection;
+    private StorySocketUI _draggingFromSocket;
+
+    public bool IsDraggingConnection => _draggingConnection != null;
 
     private bool _isActive;
 
-    /// <summary>
-    /// Инициализирует карту для темы.
-    /// </summary>
     public void Initialize(StoryTopic topic, System.Action<StoryTopic> onSubmitted, System.Action onReturnToCatalog = null)
     {
         _currentTopic = topic;
@@ -79,33 +67,57 @@ public class StoryMapUI : MonoBehaviour
 
         if (Keyboard.current != null && Keyboard.current[Key.Escape].wasPressedThisFrame)
         {
-            // Отменяем вооружённый сокет, если есть
-            if (_armedSocket != null)
-            {
-                _armedSocket.SetArmed(false);
-                _armedSocket = null;
-            }
+            if (IsDraggingConnection)
+                CancelDraggingConnection();
             else
             {
                 _isActive = false;
                 _onReturnToCatalog?.Invoke();
             }
+            return;
+        }
+
+        if (IsDraggingConnection && Mouse.current != null)
+        {
+            Vector2 screenPos = Mouse.current.position.ReadValue();
+
+            Canvas canvas = mapArea.GetComponentInParent<Canvas>();
+            Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                         ? canvas.worldCamera : null;
+
+            Vector2 localPoint;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    mapArea, screenPos, cam, out localPoint))
+            {
+                _draggingConnection.UpdateDraggingEndpoint(localPoint);
+            }
+
+            if (Mouse.current.rightButton.wasPressedThisFrame)
+                CancelDraggingConnection();
         }
     }
+
+    // ===== Построение карты =====
 
     private void BuildNodes()
     {
         if (_currentTopic.nodePlacements == null) return;
+        if (!ValidatePrefab(nodePrefab, "nodePrefab")) return;
+        if (!ValidatePrefab(connectionPrefab, "connectionPrefab")) return;
 
         foreach (var placement in _currentTopic.nodePlacements)
         {
             if (placement == null || placement.node == null) continue;
 
-            GameObject obj = Instantiate(nodePrefab, nodesContainer);
+            GameObject obj = Instantiate(nodePrefab, mapArea);
+
             RectTransform rt = obj.GetComponent<RectTransform>();
+            if (rt == null) { Destroy(obj); continue; }
             rt.localPosition = placement.position;
 
             StoryNodeUI nodeUI = obj.GetComponent<StoryNodeUI>();
+            if (nodeUI == null) { Destroy(obj); continue; }
+
             bool unlocked = IntelManager.Instance != null
                          && IntelManager.Instance.HasKey(placement.node.requiredIntelKey);
 
@@ -116,106 +128,121 @@ public class StoryMapUI : MonoBehaviour
         }
     }
 
+    private bool ValidatePrefab(GameObject prefab, string fieldName)
+    {
+        if (prefab == null)
+        {
+            Debug.LogError($"[StoryMap] Поле '{fieldName}' не назначено.");
+            return false;
+        }
+        if (prefab.GetComponent<RectTransform>() == null)
+        {
+            Debug.LogError($"[StoryMap] Префаб '{prefab.name}' не имеет RectTransform.");
+            return false;
+        }
+        return true;
+    }
+
     private void OnNodeMoved(StoryNodeUI node)
     {
-        // Пересчитать все связи, связанные с этой нодой.
         foreach (var conn in _connections)
-        {
             if (conn.From == node || conn.To == node)
                 conn.UpdateShape();
-        }
+
+        if (_draggingConnection != null && _draggingConnection.From == node)
+            _draggingConnection.UpdateShape();
     }
 
-    // ===== Логика создания связей =====
+    // ===== Логика тянущейся нити =====
 
-    public void OnSocketClicked(StorySocketUI socket)
+    public void BeginDraggingConnectionFrom(StorySocketUI socket)
     {
+        if (IsDraggingConnection) CancelDraggingConnection();
+
+        if (HasExistingConnectionOn(socket))
+        {
+            AudioManager.Instance?.PlayPCButton();
+            return;
+        }
+
         AudioManager.Instance?.PlayPCButton();
+        _draggingFromSocket = socket;
 
-        if (_armedSocket == null)
-        {
-            // Первый клик — только на Output
-            if (socket.Type != SocketType.Output) return;
-
-            _armedSocket = socket;
-            socket.SetArmed(true);
-            return;
-        }
-
-        // Клик по тому же сокету — отмена
-        if (_armedSocket == socket)
-        {
-            socket.SetArmed(false);
-            _armedSocket = null;
-            return;
-        }
-
-        // Второй клик — ожидаем Input другой ноды
-        if (socket.Type != SocketType.Input)
-        {
-            // Перепривязываем к новому Output, если кликнули на другой Output
-            if (socket.Type == SocketType.Output)
-            {
-                _armedSocket.SetArmed(false);
-                _armedSocket = socket;
-                socket.SetArmed(true);
-            }
-            return;
-        }
-
-        StoryNodeUI from = _armedSocket.Owner;
-        StoryNodeUI to = socket.Owner;
-
-        _armedSocket.SetArmed(false);
-        _armedSocket = null;
-
-        TryCreateConnection(from, to);
+        GameObject obj = Instantiate(connectionPrefab, mapArea);
+        // Нити — под нодами
+        obj.transform.SetAsFirstSibling();
+        _draggingConnection = obj.GetComponent<StoryConnectionUI>();
+        _draggingConnection.InitializeDragging(socket.Owner, socket.Type, this);
     }
 
-    private void TryCreateConnection(StoryNodeUI from, StoryNodeUI to)
+    public void TryCompleteConnectionOn(StorySocketUI secondSocket)
     {
-        // Нельзя соединять с самой собой
-        if (from == to) return;
+        if (_draggingConnection == null || _draggingFromSocket == null) return;
 
-        // Правило категорий: cat N → cat N+1
-        bool categoriesValid = (to.Node.category == from.Node.category + 1);
+        StorySocketUI first = _draggingFromSocket;
+        StorySocketUI second = secondSocket;
 
-        // Проверка дублирования: у from.Output уже есть связь? (правило: одна связь с выхода)
+        if (first == second) { CancelDraggingConnection(); return; }
+        if (first.Owner == second.Owner) { CancelDraggingConnection(); return; }
+
+        int catA = first.Owner.Node.category;
+        int catB = second.Owner.Node.category;
+
+        StoryNodeUI fromNode, toNode;
+        if (catB == catA + 1) { fromNode = first.Owner; toNode = second.Owner; }
+        else if (catA == catB + 1) { fromNode = second.Owner; toNode = first.Owner; }
+        else { StartCoroutine(FlashInvalidAndCancel()); return; }
+
+        StorySocketUI fromSocket = (first.Owner == fromNode) ? first : second;
+        StorySocketUI toSocket = (first.Owner == toNode) ? first : second;
+
+        if (fromSocket.Type != SocketType.Output || toSocket.Type != SocketType.Input)
+        {
+            StartCoroutine(FlashInvalidAndCancel());
+            return;
+        }
+
         foreach (var c in _connections)
         {
-            if (c.From == from) return; // у ноды from уже есть исходящая связь
-            if (c.To == to) return;     // к ноде to уже ведёт входящая связь
+            if (c.From == fromNode) { CancelDraggingConnection(); return; }
+            if (c.To == toNode)     { CancelDraggingConnection(); return; }
         }
 
-        if (!categoriesValid)
-        {
-            // Красная нить — создаём, показываем, через 1 секунду удаляем
-            StartCoroutine(SpawnInvalidConnection(from, to));
-            return;
-        }
-
-        GameObject obj = Instantiate(connectionPrefab, connectionsContainer);
-        // Линии должны быть под нодами визуально:
-        obj.transform.SetAsFirstSibling();
-
-        StoryConnectionUI conn = obj.GetComponent<StoryConnectionUI>();
-        conn.Initialize(from, to, this);
-        _connections.Add(conn);
+        AudioManager.Instance?.PlayPCButton();
+        _draggingConnection.InitializeComplete(fromNode, toNode, this);
+        _connections.Add(_draggingConnection);
+        _draggingConnection = null;
+        _draggingFromSocket = null;
 
         EvaluateChain();
     }
 
-    private System.Collections.IEnumerator SpawnInvalidConnection(StoryNodeUI from, StoryNodeUI to)
+    private System.Collections.IEnumerator FlashInvalidAndCancel()
     {
-        GameObject obj = Instantiate(connectionPrefab, connectionsContainer);
-        obj.transform.SetAsFirstSibling();
-        StoryConnectionUI conn = obj.GetComponent<StoryConnectionUI>();
-        conn.Initialize(from, to, this);
-        conn.SetState(StoryConnectionUI.ConnectionState.Invalid);
+        if (_draggingConnection == null) yield break;
+        _draggingConnection.SetState(StoryConnectionUI.ConnectionState.Invalid);
+        yield return new WaitForSeconds(0.4f);
+        CancelDraggingConnection();
+    }
 
-        yield return new WaitForSeconds(0.6f);
+    public void CancelDraggingConnection()
+    {
+        if (_draggingConnection != null)
+        {
+            Destroy(_draggingConnection.gameObject);
+            _draggingConnection = null;
+        }
+        _draggingFromSocket = null;
+    }
 
-        if (conn != null) Destroy(conn.gameObject);
+    private bool HasExistingConnectionOn(StorySocketUI socket)
+    {
+        foreach (var c in _connections)
+        {
+            if (socket.Type == SocketType.Output && c.From == socket.Owner) return true;
+            if (socket.Type == SocketType.Input && c.To == socket.Owner) return true;
+        }
+        return false;
     }
 
     public void RemoveConnection(StoryConnectionUI conn)
@@ -228,16 +255,15 @@ public class StoryMapUI : MonoBehaviour
 
     // ===== Валидация цепочки =====
 
-    /// <summary>
-    /// Проверяет, собрана ли валидная цепочка нужной длины (0→1→...).
-    /// Если да — красит связи в зелёный и показывает кнопку "Отправить".
-    /// </summary>
     private void EvaluateChain()
     {
         List<StoryConnectionUI> chain = FindCompleteChain();
         bool complete = chain != null && chain.Count == _currentTopic.requiredChainLength - 1;
 
-        // Сбрасываем состояние всех связей
+        Debug.Log($"[StoryMap] EvaluateChain: connections={_connections.Count}, " +
+                  $"requiredLength={_currentTopic.requiredChainLength}, " +
+                  $"foundChainLength={(chain != null ? chain.Count : 0)}, complete={complete}");
+
         foreach (var c in _connections)
             c.SetState(StoryConnectionUI.ConnectionState.Valid);
 
@@ -253,42 +279,31 @@ public class StoryMapUI : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Ищет цепочку cat 0 → cat 1 → ... → cat (requiredChainLength-1).
-    /// Возвращает список связей в порядке цепочки, или null.
-    /// </summary>
     private List<StoryConnectionUI> FindCompleteChain()
     {
-        // Стартуем с ноды категории 0
-        StoryNodeUI root = _nodes.Find(n => n.Node.category == 0 && HasAnyConnectionFrom(n));
-        if (root == null) return null;
-
-        var result = new List<StoryConnectionUI>();
-        StoryNodeUI current = root;
-        int expectedNextCat = 1;
-
-        while (expectedNextCat < _currentTopic.requiredChainLength)
+        foreach (var root in _nodes)
         {
-            StoryConnectionUI next = _connections.Find(
-                c => c.From == current && c.To.Node.category == expectedNextCat);
-            if (next == null) return null;
+            if (root.Node.category != 0) continue;
 
-            result.Add(next);
-            current = next.To;
-            expectedNextCat++;
+            var result = new List<StoryConnectionUI>();
+            StoryNodeUI current = root;
+            int expectedNextCat = 1;
+            bool ok = true;
+
+            while (expectedNextCat < _currentTopic.requiredChainLength)
+            {
+                StoryConnectionUI next = _connections.Find(
+                    c => c.From == current && c.To.Node.category == expectedNextCat);
+                if (next == null) { ok = false; break; }
+                result.Add(next);
+                current = next.To;
+                expectedNextCat++;
+            }
+
+            if (ok) return result;
         }
-
-        return result;
+        return null;
     }
-
-    private bool HasAnyConnectionFrom(StoryNodeUI node)
-    {
-        foreach (var c in _connections)
-            if (c.From == node) return true;
-        return false;
-    }
-
-    // ===== Отправка сюжета =====
 
     private void OnSubmit()
     {
@@ -297,7 +312,6 @@ public class StoryMapUI : MonoBehaviour
 
         AudioManager.Instance?.PlayPCButton();
 
-        // Собираем ноды цепочки по порядку: root → through each connection.To
         var chainNodes = new List<StoryNode>();
         if (chain.Count > 0)
         {
@@ -306,7 +320,6 @@ public class StoryMapUI : MonoBehaviour
                 chainNodes.Add(c.To.Node);
         }
 
-        // Подсчёт очков и сбор текстов для эфира
         int fA = 0, fB = 0, fC = 0, fD = 0;
         var broadcastTexts = new List<string>();
         foreach (var n in chainNodes)
@@ -320,12 +333,8 @@ public class StoryMapUI : MonoBehaviour
         }
 
         if (GameProgressManager.Instance != null)
-        {
             GameProgressManager.Instance.RegisterStoryMap(
-                broadcastTexts.ToArray(),
-                fA, fB, fC, fD
-            );
-        }
+                broadcastTexts.ToArray(), fA, fB, fC, fD);
 
         TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.StorySubmitted);
 
@@ -335,10 +344,17 @@ public class StoryMapUI : MonoBehaviour
 
     private void ClearAll()
     {
-        foreach (Transform child in nodesContainer) Destroy(child.gameObject);
-        foreach (Transform child in connectionsContainer) Destroy(child.gameObject);
+        foreach (Transform child in mapArea)
+        {
+            // Не уничтожаем сами TopicTitle/SubmitButton если они дочерние mapArea.
+            // Но рекомендуется их класть НЕ в mapArea, а в StoryMapPanel напрямую.
+            // Удаляем только ноды и коннекторы.
+            if (child.GetComponent<StoryNodeUI>() != null || child.GetComponent<StoryConnectionUI>() != null)
+                Destroy(child.gameObject);
+        }
         _nodes.Clear();
         _connections.Clear();
-        _armedSocket = null;
+        _draggingConnection = null;
+        _draggingFromSocket = null;
     }
 }

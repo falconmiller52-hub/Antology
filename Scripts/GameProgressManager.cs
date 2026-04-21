@@ -5,9 +5,6 @@ using System.Collections.Generic;
 /// <summary>
 /// Синглтон прогрессии: дни, счётчик сюжетов, очки фракций.
 /// Живёт между сценами (DontDestroyOnLoad).
-///
-/// 4 фракции (A/B/C/D) — используются новой системой ментальной карты.
-/// Старая система (RegisterStory с 2 фракциями) сохранена для совместимости.
 /// </summary>
 public class GameProgressManager : MonoBehaviour
 {
@@ -23,7 +20,6 @@ public class GameProgressManager : MonoBehaviour
     [SerializeField] private string endingAScene = "EndingA";
     [SerializeField] private string endingBScene = "EndingB";
 
-    // Текущее состояние
     public int CurrentDay { get; private set; } = 1;
     public int StoriesCompletedToday { get; private set; }
     public int FactionAScore { get; private set; }
@@ -34,8 +30,6 @@ public class GameProgressManager : MonoBehaviour
     public int StoriesPerDay => storiesPerDay;
     public int TotalDays => totalDays;
 
-    // Сюжеты за текущий день.
-    // Каждый сюжет = массив строк (текстов broadcast'а по ячейкам цепочки).
     private List<string[]> _todayStoryBlocks = new List<string[]>();
 
     private void Awake()
@@ -52,6 +46,9 @@ public class GameProgressManager : MonoBehaviour
 
         ResetAllScriptableObjects();
         ResetDay();
+
+        Debug.Log($"[GameProgress] Awake. totalDays={totalDays}, storiesPerDay={storiesPerDay}, " +
+                  $"gameplayScenes=[{string.Join(", ", gameplayScenes)}], intermediaScene='{intermediaScene}'");
     }
 
     private void OnDestroy()
@@ -72,10 +69,6 @@ public class GameProgressManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Устаревший метод: старая система с 2 фракциями.
-    /// Оставлен для совместимости с легаси-сценами.
-    /// </summary>
     public void RegisterStory(string[] blocks, int factionAPoints, int factionBPoints)
     {
         if (StoriesCompletedToday < storiesPerDay)
@@ -87,15 +80,9 @@ public class GameProgressManager : MonoBehaviour
         FactionAScore += factionAPoints;
         FactionBScore += factionBPoints;
 
-        Debug.Log($"[GameProgress][Legacy] Story registered. Day {CurrentDay}, " +
-                  $"Stories: {StoriesCompletedToday}/{storiesPerDay}, " +
-                  $"A:{FactionAScore} B:{FactionBScore}");
+        Debug.Log($"[GameProgress][Legacy] Story registered. Stories: {StoriesCompletedToday}/{storiesPerDay}");
     }
 
-    /// <summary>
-    /// Новый метод для системы ментальной карты.
-    /// broadcastTexts — тексты по ячейкам цепочки (в порядке от cat 0 до cat N).
-    /// </summary>
     public void RegisterStoryMap(string[] broadcastTexts, int fA, int fB, int fC, int fD)
     {
         if (StoriesCompletedToday < storiesPerDay)
@@ -114,25 +101,27 @@ public class GameProgressManager : MonoBehaviour
                   $"A:{FactionAScore} B:{FactionBScore} C:{FactionCScore} D:{FactionDScore}");
     }
 
-    /// <summary>
-    /// Возвращает все блоки всех сюжетов за сегодня (для Intermedia).
-    /// </summary>
-    public List<string[]> GetTodayStoryBlocks()
-    {
-        return _todayStoryBlocks;
-    }
+    public List<string[]> GetTodayStoryBlocks() => _todayStoryBlocks;
 
     public void EndShift()
     {
+        Debug.Log($"[GameProgress] EndShift called. Loading '{intermediaScene}'.");
         SceneManager.LoadScene(intermediaScene);
     }
 
     public void OnBroadcastFinished()
     {
+        Debug.Log($"[GameProgress] OnBroadcastFinished. Before increment: CurrentDay={CurrentDay}, totalDays={totalDays}");
+
         CurrentDay++;
+
+        Debug.Log($"[GameProgress] After increment: CurrentDay={CurrentDay}. " +
+                  $"Condition 'CurrentDay > totalDays' = {CurrentDay > totalDays}");
 
         if (CurrentDay > totalDays)
         {
+            Debug.Log($"[GameProgress] All days complete — game over. " +
+                      $"(If this is unexpected, check totalDays in inspector — should be 3 for 3-day game.)");
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
@@ -143,7 +132,9 @@ public class GameProgressManager : MonoBehaviour
         {
             ResetDay();
             int sceneIndex = Mathf.Clamp(CurrentDay - 1, 0, gameplayScenes.Length - 1);
-            SceneManager.LoadScene(gameplayScenes[sceneIndex]);
+            string nextScene = gameplayScenes[sceneIndex];
+            Debug.Log($"[GameProgress] Loading next gameplay scene: '{nextScene}' (index {sceneIndex}).");
+            SceneManager.LoadScene(nextScene);
         }
     }
 

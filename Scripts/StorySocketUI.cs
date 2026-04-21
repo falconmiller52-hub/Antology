@@ -3,28 +3,30 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// Точка соединения на ячейке: левая (Input) или правая (Output).
-/// Игрок кликает ЛКМ сначала на Output одной ячейки, затем на Input другой —
-/// создаётся связь (если разрешена правилами).
+/// Точка соединения на ячейке (Input слева / Output справа).
 ///
-/// Настройка:
-/// 1. Дочерний Image внутри StoryNodeUI префаба.
-/// 2. Raycast Target = ON.
-/// 3. Повесьте этот скрипт.
+/// UX создания связи:
+///  - Клик ЛКМ на сокете → начинается "вытягивание" (rubber band) линии.
+///  - Пока тянем: линия обновляется каждый кадр до курсора.
+///  - Клик ЛКМ на другом сокете → связь фиксируется, если совместима (cat N → cat N+1).
+///  - ПКМ или Esc → отмена.
+///
+/// Сокет должен перехватывать клик (IPointerDownHandler), чтобы нода не начала
+/// драгаться вместо создания связи. Используем Use=true в PointerDown — это
+/// помечает событие как обработанное и нода не получит OnPointerDown.
 /// </summary>
-public class StorySocketUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class StorySocketUI : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("Visual")]
     [SerializeField] private Image socketImage;
     [SerializeField] private Color idleColor = new Color(0.6f, 0.6f, 0.6f, 1f);
     [SerializeField] private Color hoverColor = new Color(1f, 1f, 0.5f, 1f);
-    [SerializeField] private Color armedColor = new Color(0.3f, 0.8f, 1f, 1f);
 
     public StoryNodeUI Owner { get; private set; }
     public SocketType Type { get; private set; }
 
     private StoryMapUI _map;
-    private bool _isArmed;
+    private bool _isHovered;
 
     private void Awake()
     {
@@ -37,42 +39,55 @@ public class StorySocketUI : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         Owner = owner;
         Type = type;
         _map = map;
-        SetArmed(false);
+        SetIdle();
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public bool IsHovered => _isHovered;
+
+    public void OnPointerDown(PointerEventData eventData)
     {
         if (Owner == null || !Owner.IsUnlocked) return;
         if (_map == null) return;
 
         if (eventData.button == PointerEventData.InputButton.Left)
         {
-            _map.OnSocketClicked(this);
+            // Сначала проверим, тянется ли уже нить — если да, это попытка её замкнуть.
+            if (_map.IsDraggingConnection)
+            {
+                _map.TryCompleteConnectionOn(this);
+            }
+            else
+            {
+                _map.BeginDraggingConnectionFrom(this);
+            }
+
+            // Помечаем событие обработанным — иначе OnPointerDown ноды тоже сработает
+            // и нода начнёт драгаться вслед за курсором.
+            eventData.Use();
         }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (Owner == null || !Owner.IsUnlocked) return;
-        if (socketImage != null && !_isArmed)
+        _isHovered = true;
+        if (socketImage != null)
             socketImage.color = hoverColor;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (socketImage != null && !_isArmed)
+        _isHovered = false;
+        if (socketImage != null)
             socketImage.color = idleColor;
     }
 
-    public void SetArmed(bool armed)
+    public void SetIdle()
     {
-        _isArmed = armed;
+        _isHovered = false;
         if (socketImage != null)
-            socketImage.color = armed ? armedColor : idleColor;
+            socketImage.color = idleColor;
     }
 
-    public Vector2 GetLocalPosition()
-    {
-        return Owner.GetSocketLocalPosition(Type);
-    }
+    public Vector2 GetLocalPosition() => Owner.GetSocketLocalPosition(Type);
 }
