@@ -29,6 +29,12 @@ public class StoryTopic : ScriptableObject
     [Tooltip("Точная длина цепочки для валидного сюжета (обычно 4 = cat 0→1→2→3).")]
     public int requiredChainLength = 4;
 
+    [Header("Canvas Size")]
+    [Tooltip("Размер холста (mapArea) для этой темы. " +
+             "Если больше видимой области — игрок сможет панорамировать. " +
+             "Если (0, 0) — используется исходный размер mapArea.")]
+    public Vector2 canvasSize = new Vector2(3000f, 2000f);
+
     // ===== СТАРАЯ СИСТЕМА (legacy, для переходного периода) =====
 
     [Header("Legacy (old blocks system)")]

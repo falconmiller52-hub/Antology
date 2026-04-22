@@ -66,30 +66,58 @@ public class BroadcastScene : MonoBehaviour
             foreach (string line in greetingLines)
                 _allLines.Add(line);
 
+        int greetingCount = _allLines.Count;
+
         // Сюжеты игрока — каждая ячейка цепочки = отдельная реплика
+        int storyLinesAdded = 0;
         if (GameProgressManager.Instance != null)
         {
             List<string[]> storyBlocks = GameProgressManager.Instance.GetTodayStoryBlocks();
+            Debug.Log($"[Broadcast] BuildLinesList: storyBlocks count = " +
+                      $"{(storyBlocks != null ? storyBlocks.Count : 0)}");
+
             if (storyBlocks != null)
             {
                 for (int s = 0; s < storyBlocks.Count; s++)
                 {
                     string[] blocks = storyBlocks[s];
-                    if (blocks == null) continue;
+                    if (blocks == null)
+                    {
+                        Debug.LogWarning($"[Broadcast] Story #{s} is null.");
+                        continue;
+                    }
+                    Debug.Log($"[Broadcast] Story #{s}: {blocks.Length} texts.");
 
                     foreach (string block in blocks)
                     {
                         if (!string.IsNullOrEmpty(block))
+                        {
                             _allLines.Add(block);
+                            storyLinesAdded++;
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[Broadcast] Skipped empty story text — check " +
+                                             "StoryNode.description is filled.");
+                        }
                     }
                 }
             }
+        }
+        else
+        {
+            Debug.LogError("[Broadcast] GameProgressManager.Instance is NULL. " +
+                           "Убедитесь, что GameProgressManager создаётся в MainMenu и использует DontDestroyOnLoad.");
         }
 
         // Прощание
         if (farewellLines != null)
             foreach (string line in farewellLines)
                 _allLines.Add(line);
+
+        Debug.Log($"[Broadcast] Total lines prepared: greeting={greetingCount}, " +
+                  $"stories={storyLinesAdded}, farewell={(farewellLines != null ? farewellLines.Length : 0)}, " +
+                  $"total={_allLines.Count}");
     }
 
     private void ShowLine(int index)

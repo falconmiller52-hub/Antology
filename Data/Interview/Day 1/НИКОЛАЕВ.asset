@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "\u041D\u0418\u041A\u041E\u041B\u0410\u0415\u0412"
   m_EditorClassIdentifier: Assembly-CSharp::InterviewData
   npcName: "\u041D\u0418\u041A\u041E\u041B\u0410\u0415\u0412"
-  npcIcon: {fileID: 8221397018206217885, guid: 84756c98c9de58f4bb48ee713011d08e, type: 3}
+  npcIcon: {fileID: 21300000, guid: 7acd6a763b73d5f4c9f483b7bf3d83e8, type: 3}
   npcDescription: "\u0413\u043B\u0430\u0432\u0430 \u0434\u0435\u043B\u0435\u0433\u0430\u0446\u0438\u0438
     \u0432 \u041E\u0437\u0435\u0440\u043D\u044B\u0439"
   voiceBlip: {fileID: 8300000, guid: 154ec9e64db7c5843b72924366841cfb, type: 3}

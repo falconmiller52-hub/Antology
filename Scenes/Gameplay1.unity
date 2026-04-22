@@ -1412,7 +1412,6 @@ Transform:
   - {fileID: 1222416268}
   - {fileID: 1393620846}
   - {fileID: 1588749880}
-  - {fileID: 1662645113}
   - {fileID: 667693811}
   - {fileID: 2118803305}
   - {fileID: 1884177697}
@@ -4889,58 +4888,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 355606076}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1662645112
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1662645113}
-  - component: {fileID: 1662645114}
-  m_Layer: 0
-  m_Name: GameProgress
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1662645113
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1662645112}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 355606076}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1662645114
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1662645112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 218b65da1e54d7348bc380d36acc5e25, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameProgressManager
-  storiesPerDay: 1
-  totalDays: 2
-  gameplayScenes:
-  - Gameplay1
-  - Gameplay2
-  intermediaScene: Intermedia
-  endingAScene: EndingA
-  endingBScene: EndingB
 --- !u!1 &1758178186
 GameObject:
   m_ObjectHideFlags: 0
@@ -5562,6 +5509,7 @@ MonoBehaviour:
       \u043E\u0442\u0432\u043B\u0435\u043A\u0430\u044E..."
     waitForEvent: 0
     unlockZone: 0
+  enableOnlyInFirstDay: 1
   letterObjects:
   - {fileID: 966745234}
   newspaperObjects:

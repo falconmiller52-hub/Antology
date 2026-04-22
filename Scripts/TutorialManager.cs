@@ -41,6 +41,11 @@ public class TutorialManager : MonoBehaviour
     [Header("Tutorial Blocks")]
     [SerializeField] private TutorialBlock[] blocks;
 
+    [Header("Enable Conditions")]
+    [Tooltip("Если true — туториал запустится только если GameProgressManager.CurrentDay == 1. " +
+             "Полезно оставить один и тот же TutorialManager-префаб в нескольких сценах.")]
+    [SerializeField] private bool enableOnlyInFirstDay = true;
+
     [Header("Interaction Zones")]
     [SerializeField] private GameObject[] letterObjects;
     [SerializeField] private GameObject[] newspaperObjects;
@@ -72,10 +77,33 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
+        // Проверка: должен ли туториал вообще запускаться в этой сцене?
+        bool shouldDisable = false;
+        string disableReason = null;
+
         if (blocks == null || blocks.Length == 0)
         {
-            Debug.Log("[Tutorial] No blocks configured — tutorial disabled.");
+            shouldDisable = true;
+            disableReason = "no blocks configured";
+        }
+        else if (enableOnlyInFirstDay
+                 && GameProgressManager.Instance != null
+                 && GameProgressManager.Instance.CurrentDay > 1)
+        {
+            shouldDisable = true;
+            disableReason = $"CurrentDay={GameProgressManager.Instance.CurrentDay} > 1 and enableOnlyInFirstDay=true";
+        }
+
+        if (shouldDisable)
+        {
+            Debug.Log($"[Tutorial] Disabled: {disableReason}.");
             IsTutorialActive = false;
+            // Гарантируем, что ничего не залипло от возможных предыдущих запусков.
+            InteractableItem.InteractionLocked = false;
+            if (tutorialPanel != null)
+                tutorialPanel.SetActive(false);
+            // Все зоны должны быть доступны сразу.
+            UnlockZone(TutorialZone.All);
             return;
         }
 

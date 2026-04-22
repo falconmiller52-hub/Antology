@@ -5,11 +5,14 @@ using UnityEngine;
 /// Создаётся через Assets → Create → Story → Node.
 ///
 /// Категории: 0 = корневая (тема), 1, 2, 3 — последующие звенья цепочки.
-/// Связи допустимы только 0→1, 1→2, 2→3 (по возрастанию ровно на 1).
+/// Связи допустимы только 0→1, 1→2, 2→3.
 ///
 /// Каждая нода требует IntelKey — игрок должен собрать ключ, чтобы
-/// ячейка стала интерактивной. На одном ключе может висеть несколько нод
-/// (разные трактовки одного факта).
+/// ячейка стала интерактивной. На одном ключе может висеть несколько нод.
+///
+/// Поле description используется для:
+///  - заголовка/описания ноды в редакторе,
+///  - реплики в эфире (Intermedia) — если нода попала в собранный сюжет.
 /// </summary>
 [CreateAssetMenu(fileName = "NewStoryNode", menuName = "Story/Node")]
 public class StoryNode : ScriptableObject
@@ -17,7 +20,8 @@ public class StoryNode : ScriptableObject
     [Header("Display")]
     public string label = "Новая ячейка";
 
-    [TextArea(1, 3)]
+    [TextArea(2, 5)]
+    [Tooltip("Описание ноды. Зачитывается в эфире Intermedia, если нода попала в сюжет.")]
     public string description;
 
     [Header("Category")]
@@ -34,9 +38,4 @@ public class StoryNode : ScriptableObject
     public int factionBPoints;
     public int factionCPoints;
     public int factionDPoints;
-
-    [Header("Broadcast")]
-    [TextArea(2, 5)]
-    [Tooltip("Текст, который зачитывается в эфире, если нода попала в сюжет.")]
-    public string broadcastText;
 }

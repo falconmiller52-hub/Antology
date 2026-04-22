@@ -57,6 +57,16 @@ public class StoryMapUI : MonoBehaviour
         submitButton.onClick.RemoveAllListeners();
         submitButton.onClick.AddListener(OnSubmit);
 
+        // Если на mapArea висит StoryMapViewport — настраиваем размер холста
+        // из темы и сбрасываем зум/позицию к дефолту.
+        StoryMapViewport viewport = mapArea.GetComponent<StoryMapViewport>();
+        if (viewport != null)
+        {
+            if (topic.canvasSize != Vector2.zero)
+                viewport.SetCanvasSize(topic.canvasSize);
+            viewport.ResetView();
+        }
+
         ClearAll();
         BuildNodes();
     }
@@ -328,8 +338,8 @@ public class StoryMapUI : MonoBehaviour
             fB += n.factionBPoints;
             fC += n.factionCPoints;
             fD += n.factionDPoints;
-            if (!string.IsNullOrEmpty(n.broadcastText))
-                broadcastTexts.Add(n.broadcastText);
+            if (!string.IsNullOrEmpty(n.description))
+                broadcastTexts.Add(n.description);
         }
 
         if (GameProgressManager.Instance != null)
