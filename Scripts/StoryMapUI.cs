@@ -28,6 +28,11 @@ public class StoryMapUI : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private Button submitButton;
     [SerializeField] private TextMeshProUGUI topicTitleText;
+    [SerializeField] private StoryMapSidePanel sidePanel;
+
+    [Header("Viewport (optional)")]
+    [Tooltip("Если назначен — скрипт подпишется на его OnPanStarted для скрытия sidePanel.")]
+    [SerializeField] private StoryMapViewport viewport;
 
     private StoryTopic _currentTopic;
     private System.Action<StoryTopic> _onSubmitted;
@@ -42,6 +47,21 @@ public class StoryMapUI : MonoBehaviour
     public bool IsDraggingConnection => _draggingConnection != null;
 
     private bool _isActive;
+
+    // Статический кэш состояния карты per-тема. Переживает закрытие/открытие
+    // компьютера и повторный выбор темы. Сбрасывается только при OnSubmit
+    // (тема отправлена) или ResetAll (новая игра).
+    private static Dictionary<StoryTopic, StoryMapState> _stateCache
+        = new Dictionary<StoryTopic, StoryMapState>();
+
+    public static void ClearAllCachedStates() => _stateCache.Clear();
+
+    private class StoryMapState
+    {
+        public Dictionary<StoryNode, Vector2> nodePositions = new Dictionary<StoryNode, Vector2>();
+        // Пары (from, to) уже созданных связей.
+        public List<(StoryNode from, StoryNode to)> connections = new List<(StoryNode, StoryNode)>();
+    }
 
     public void Initialize(StoryTopic topic, System.Action<StoryTopic> onSubmitted, System.Action onReturnToCatalog = null)
     {
@@ -81,6 +101,7 @@ public class StoryMapUI : MonoBehaviour
                 CancelDraggingConnection();
             else
             {
+                SaveStateToCache();
                 _isActive = false;
                 _onReturnToCatalog?.Invoke();
             }
@@ -107,6 +128,66 @@ public class StoryMapUI : MonoBehaviour
         }
     }
 
+    // ===== SidePanel =====
+
+    private void OnNodeClicked(StoryNodeUI node)
+    {
+        if (sidePanel != null)
+            sidePanel.ShowSingleNode(node.Node);
+    }
+
+    /// <summary>
+    /// Вызывается StoryMapViewport когда игрок нажал ЛКМ на пустое место (не нода, не сокет).
+    /// Скрывает sidePanel.
+    /// </summary>
+    public void OnEmptySpaceClicked()
+    {
+        if (sidePanel != null)
+            sidePanel.Hide();
+    }
+
+    /// <summary>
+    /// Показывает в sidePanel черновик: описания всех нод, входящих в текущую
+    /// (возможно частичную) цепочку от cat 0 по возрастанию.
+    /// </summary>
+    private void ShowChainDraftInSidePanel()
+    {
+        if (sidePanel == null) return;
+
+        var chainNodes = GetCurrentChainNodes();
+        if (chainNodes.Count == 0)
+        {
+            sidePanel.Hide();
+            return;
+        }
+        sidePanel.ShowChainDraft(chainNodes);
+    }
+
+    /// <summary>
+    /// Ищет цепочку от ноды cat 0, проходя по существующим связям вверх по категориям,
+    /// пока они есть. Может вернуть частичную цепочку (не обязательно полной длины).
+    /// </summary>
+    private List<StoryNode> GetCurrentChainNodes()
+    {
+        var result = new List<StoryNode>();
+
+        // Берём первую cat=0 ноду, у которой есть исходящая связь.
+        StoryNodeUI root = _nodes.Find(n => n.Node.category == 0 && HasAnyConnectionFrom(n));
+        if (root == null) return result;
+
+        result.Add(root.Node);
+        StoryNodeUI current = root;
+
+        while (true)
+        {
+            StoryConnectionUI next = _connections.Find(c => c.From == current);
+            if (next == null) break;
+            result.Add(next.To.Node);
+            current = next.To;
+        }
+        return result;
+    }
+
     // ===== Построение карты =====
 
     private void BuildNodes()
@@ -114,6 +195,10 @@ public class StoryMapUI : MonoBehaviour
         if (_currentTopic.nodePlacements == null) return;
         if (!ValidatePrefab(nodePrefab, "nodePrefab")) return;
         if (!ValidatePrefab(connectionPrefab, "connectionPrefab")) return;
+
+        // Пробуем взять сохранённое состояние темы
+        StoryMapState cached;
+        _stateCache.TryGetValue(_currentTopic, out cached);
 
         foreach (var placement in _currentTopic.nodePlacements)
         {
@@ -123,7 +208,13 @@ public class StoryMapUI : MonoBehaviour
 
             RectTransform rt = obj.GetComponent<RectTransform>();
             if (rt == null) { Destroy(obj); continue; }
-            rt.localPosition = placement.position;
+
+            // Позиция: сначала пытаемся взять из кэша, иначе используем placement.
+            Vector2 pos;
+            if (cached != null && cached.nodePositions.TryGetValue(placement.node, out pos))
+                rt.localPosition = pos;
+            else
+                rt.localPosition = placement.position;
 
             StoryNodeUI nodeUI = obj.GetComponent<StoryNodeUI>();
             if (nodeUI == null) { Destroy(obj); continue; }
@@ -133,8 +224,28 @@ public class StoryMapUI : MonoBehaviour
 
             nodeUI.Initialize(placement.node, unlocked, mapArea, this);
             nodeUI.OnPositionChanged += OnNodeMoved;
+            nodeUI.OnClicked += OnNodeClicked;
 
             _nodes.Add(nodeUI);
+        }
+
+        // Восстанавливаем сохранённые связи
+        if (cached != null && cached.connections.Count > 0)
+        {
+            foreach (var (fromData, toData) in cached.connections)
+            {
+                StoryNodeUI fromUI = _nodes.Find(n => n.Node == fromData);
+                StoryNodeUI toUI = _nodes.Find(n => n.Node == toData);
+                if (fromUI == null || toUI == null) continue;
+                if (!fromUI.IsUnlocked || !toUI.IsUnlocked) continue;
+
+                GameObject connObj = Instantiate(connectionPrefab, mapArea);
+                connObj.transform.SetAsFirstSibling();
+                StoryConnectionUI conn = connObj.GetComponent<StoryConnectionUI>();
+                conn.InitializeComplete(fromUI, toUI, this);
+                _connections.Add(conn);
+            }
+            EvaluateChain();
         }
     }
 
@@ -225,6 +336,7 @@ public class StoryMapUI : MonoBehaviour
         _draggingFromSocket = null;
 
         EvaluateChain();
+        ShowChainDraftInSidePanel();
     }
 
     private System.Collections.IEnumerator FlashInvalidAndCancel()
@@ -255,12 +367,20 @@ public class StoryMapUI : MonoBehaviour
         return false;
     }
 
+    private bool HasAnyConnectionFrom(StoryNodeUI node)
+    {
+        foreach (var c in _connections)
+            if (c.From == node) return true;
+        return false;
+    }
+
     public void RemoveConnection(StoryConnectionUI conn)
     {
         AudioManager.Instance?.PlayPCButton();
         _connections.Remove(conn);
         Destroy(conn.gameObject);
         EvaluateChain();
+        ShowChainDraftInSidePanel();
     }
 
     // ===== Валидация цепочки =====
@@ -332,6 +452,7 @@ public class StoryMapUI : MonoBehaviour
 
         int fA = 0, fB = 0, fC = 0, fD = 0;
         var broadcastTexts = new List<string>();
+        var perNodeDeltas = new List<FactionDelta>();
         foreach (var n in chainNodes)
         {
             fA += n.factionAPoints;
@@ -340,25 +461,50 @@ public class StoryMapUI : MonoBehaviour
             fD += n.factionDPoints;
             if (!string.IsNullOrEmpty(n.description))
                 broadcastTexts.Add(n.description);
+            perNodeDeltas.Add(new FactionDelta
+            {
+                a = n.factionAPoints,
+                b = n.factionBPoints,
+                c = n.factionCPoints,
+                d = n.factionDPoints
+            });
         }
 
         if (GameProgressManager.Instance != null)
             GameProgressManager.Instance.RegisterStoryMap(
-                broadcastTexts.ToArray(), fA, fB, fC, fD);
+                broadcastTexts.ToArray(), fA, fB, fC, fD, perNodeDeltas.ToArray());
 
         TutorialManager.Instance?.OnTutorialEvent(TutorialEventType.StorySubmitted);
 
+        // Тема отправлена — кэш больше не нужен
+        if (_stateCache.ContainsKey(_currentTopic))
+            _stateCache.Remove(_currentTopic);
+
         _isActive = false;
         _onSubmitted?.Invoke(_currentTopic);
+    }
+
+    private void SaveStateToCache()
+    {
+        if (_currentTopic == null) return;
+
+        var state = new StoryMapState();
+        foreach (var nodeUI in _nodes)
+        {
+            RectTransform rt = nodeUI.GetComponent<RectTransform>();
+            state.nodePositions[nodeUI.Node] = rt.localPosition;
+        }
+        foreach (var conn in _connections)
+        {
+            state.connections.Add((conn.From.Node, conn.To.Node));
+        }
+        _stateCache[_currentTopic] = state;
     }
 
     private void ClearAll()
     {
         foreach (Transform child in mapArea)
         {
-            // Не уничтожаем сами TopicTitle/SubmitButton если они дочерние mapArea.
-            // Но рекомендуется их класть НЕ в mapArea, а в StoryMapPanel напрямую.
-            // Удаляем только ноды и коннекторы.
             if (child.GetComponent<StoryNodeUI>() != null || child.GetComponent<StoryConnectionUI>() != null)
                 Destroy(child.gameObject);
         }
@@ -366,5 +512,19 @@ public class StoryMapUI : MonoBehaviour
         _connections.Clear();
         _draggingConnection = null;
         _draggingFromSocket = null;
+        if (sidePanel != null) sidePanel.Hide();
     }
+}
+
+/// <summary>
+/// Изменения очков фракций для одной ноды — используется для передачи
+/// в Intermedia, чтобы показывать прыгающий текст "+1A" и т.п.
+/// </summary>
+[System.Serializable]
+public struct FactionDelta
+{
+    public int a;
+    public int b;
+    public int c;
+    public int d;
 }

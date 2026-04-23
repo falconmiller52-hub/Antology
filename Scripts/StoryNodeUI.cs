@@ -38,6 +38,7 @@ public class StoryNodeUI : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
     private Vector2 _dragOffset;
 
     public System.Action<StoryNodeUI> OnPositionChanged;
+    public System.Action<StoryNodeUI> OnClicked;
 
     public void Initialize(StoryNode node, bool unlocked, RectTransform mapArea, StoryMapUI map)
     {
@@ -82,6 +83,11 @@ public class StoryNodeUI : MonoBehaviour, IPointerDownHandler, IBeginDragHandler
         {
             _dragOffset = (Vector2)_rect.localPosition - pointerLocal;
         }
+
+        // Любой тап по ноде — показываем её description в sidePanel.
+        // Даже если игрок потом начнёт драг — панель остаётся, скроется только
+        // по клику в пустое место или при смене отображения на черновик.
+        OnClicked?.Invoke(this);
     }
 
     public void OnBeginDrag(PointerEventData eventData) { }

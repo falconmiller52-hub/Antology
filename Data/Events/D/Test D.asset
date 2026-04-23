@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c05e8b4fcd145d4d8605c026ab3765a, type: 3}
-  m_Name: Test
+  m_Name: Test D
   m_EditorClassIdentifier: Assembly-CSharp::FactionEvent
-  title: "\u041D\u043E\u0432\u043E\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u0435"
-  description: Fractions want your help
+  title: Test D
+  description: "\u041D\u0430\u0440\u043E\u0434\u0443 \u043D\u0443\u0436\u043D\u0430
+    \u043F\u043E\u043C\u043E\u0449\u044C"
   image: {fileID: 21300000, guid: f56cb723ec1c0184ea6852cc4e1366d8, type: 3}
   choices:
   - buttonText: Help

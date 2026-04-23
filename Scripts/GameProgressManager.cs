@@ -78,6 +78,18 @@ public class GameProgressManager : MonoBehaviour
 
     private List<string[]> _todayStoryBlocks = new List<string[]>();
 
+    // Делты очков по каждой ноде каждого сюжета за день. Структура совпадает
+    // с _todayStoryBlocks (список сюжетов → массив блоков).
+    // Используется Intermedia для прыгающего текста "+1A" на каждую реплику.
+    private List<FactionDelta[]> _todayStoryDeltas = new List<FactionDelta[]>();
+
+    // Снапшот очков на начало текущего дня. Обновляется при загрузке
+    // каждой Gameplay-сцены. Используется ПК-меню для счётчика в углу.
+    public int FactionAScoreAtDayStart { get; private set; }
+    public int FactionBScoreAtDayStart { get; private set; }
+    public int FactionCScoreAtDayStart { get; private set; }
+    public int FactionDScoreAtDayStart { get; private set; }
+
     // Очередь ивентов, ожидающих проигрывания в сцене Events.
     // Формируется в OnBroadcastFinished, читается и очищается EventsScene.
     private List<FactionEvent> _pendingEvents = new List<FactionEvent>();
@@ -182,9 +194,16 @@ public class GameProgressManager : MonoBehaviour
             foreach (var topic in Resources.FindObjectsOfTypeAll<StoryTopic>())
                 topic.ResetState();
 
+            // Снапшот очков на начало дня — для счётчика в ПК-меню.
+            FactionAScoreAtDayStart = FactionAScore;
+            FactionBScoreAtDayStart = FactionBScore;
+            FactionCScoreAtDayStart = FactionCScore;
+            FactionDScoreAtDayStart = FactionDScore;
+
             Debug.Log($"[GameProgress] Loaded {scene.name}. Day={CurrentDay}, " +
                       $"Stories={StoriesCompletedToday}, " +
-                      $"A={FactionAScore} B={FactionBScore} C={FactionCScore} D={FactionDScore}");
+                      $"Snapshot: A={FactionAScoreAtDayStart} B={FactionBScoreAtDayStart} " +
+                      $"C={FactionCScoreAtDayStart} D={FactionDScoreAtDayStart}");
         }
     }
 
@@ -202,11 +221,13 @@ public class GameProgressManager : MonoBehaviour
         Debug.Log($"[GameProgress][Legacy] Story registered. Stories: {StoriesCompletedToday}/{storiesPerDay}");
     }
 
-    public void RegisterStoryMap(string[] broadcastTexts, int fA, int fB, int fC, int fD)
+    public void RegisterStoryMap(string[] broadcastTexts, int fA, int fB, int fC, int fD,
+                                 FactionDelta[] perNodeDeltas = null)
     {
         if (StoriesCompletedToday < storiesPerDay)
         {
             _todayStoryBlocks.Add(broadcastTexts);
+            _todayStoryDeltas.Add(perNodeDeltas ?? new FactionDelta[0]);
             StoriesCompletedToday++;
         }
 
@@ -221,6 +242,7 @@ public class GameProgressManager : MonoBehaviour
     }
 
     public List<string[]> GetTodayStoryBlocks() => _todayStoryBlocks;
+    public List<FactionDelta[]> GetTodayStoryDeltas() => _todayStoryDeltas;
 
     public void EndShift()
     {
@@ -330,6 +352,7 @@ public class GameProgressManager : MonoBehaviour
     {
         StoriesCompletedToday = 0;
         _todayStoryBlocks.Clear();
+        _todayStoryDeltas.Clear();
     }
 
     public void ResetAll()
@@ -339,8 +362,13 @@ public class GameProgressManager : MonoBehaviour
         FactionBScore = 0;
         FactionCScore = 0;
         FactionDScore = 0;
+        FactionAScoreAtDayStart = 0;
+        FactionBScoreAtDayStart = 0;
+        FactionCScoreAtDayStart = 0;
+        FactionDScoreAtDayStart = 0;
         ResetDay();
         _pendingEvents.Clear();
+        StoryMapUI.ClearAllCachedStates();
 
         ResetAllScriptableObjects();
 

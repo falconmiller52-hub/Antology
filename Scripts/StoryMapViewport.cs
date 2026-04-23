@@ -5,17 +5,17 @@ using UnityEngine.EventSystems;
 /// Контроллер вьюпорта ментальной карты: панорамирование (ЛКМ-драг по пустоте)
 /// и зум (колесо мыши с центром в позиции курсора).
 ///
-/// Вешается на mapArea. mapArea должна быть дочерней от "рамки" —
-/// RectTransform, который ограничивает видимую область (mask/panel).
-/// Pan и zoom меняют localPosition и localScale самой mapArea.
-///
-/// Важно: у mapArea должен быть Image (можно прозрачный) с Raycast Target = ON,
-/// чтобы ловить клики/колесо на "пустом месте". Ноды и сокеты перехватывают
-/// события первыми (IPointerDownHandler), так что их клики сюда не дойдут.
+/// Также ловит ЛКМ-клики в "пустое место" (через IPointerDownHandler) и уведомляет
+/// StoryMapUI, чтобы тот скрыл боковую панель. Ноды и сокеты перехватывают
+/// клики первыми через свои IPointerDownHandler, поэтому сюда доходят только
+/// клики "мимо всех нод/сокетов".
 /// </summary>
 [RequireComponent(typeof(RectTransform))]
-public class StoryMapViewport : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IScrollHandler
+public class StoryMapViewport : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IScrollHandler
 {
+    [Header("Notify")]
+    [Tooltip("Если назначен — при клике в пустое место будет вызван OnEmptySpaceClicked.")]
+    [SerializeField] private StoryMapUI mapUI;
     [Header("Zoom")]
     [Tooltip("Множитель на одно деление колеса. 0.1 = +10% за шаг.")]
     [SerializeField] private float zoomStep = 0.1f;
@@ -68,6 +68,13 @@ public class StoryMapViewport : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     }
 
     // ===== Pan =====
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        // Клик по пустому месту (до нод/сокетов дошло) → скрываем боковую панель.
+        if (eventData.button == PointerEventData.InputButton.Left && mapUI != null)
+            mapUI.OnEmptySpaceClicked();
+    }
 
     public void OnBeginDrag(PointerEventData eventData)
     {

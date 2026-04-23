@@ -179,13 +179,13 @@ MonoBehaviour:
   endingCScene: Ending C
   endingDScene: Ending D
   factionAEvents:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 1b31f8a378de6e841acc53d1a2f94824, type: 2}
   factionBEvents:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 21a3db8c4269ec44d8ade1b61ff7aff5, type: 2}
   factionCEvents:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: d3c5918c93613dd43a5acb970045866e, type: 2}
   factionDEvents:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 1ddcf86e488d697459d78cabd0ee4cd3, type: 2}
 --- !u!1 &82454416
 GameObject:
   m_ObjectHideFlags: 0
